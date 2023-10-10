@@ -1,0 +1,25 @@
+<UI version="4.0" >
+ <class>QtHelloClass</class>
+ <widget class="QWidget" name="QtHelloClass" >
+  <property name="objectName" >
+   <string notr="true">QtHelloClass</string>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>QtHello</string>
+  </property>$centralwidget$
+ </widget>
+ <layoutDefault spacing="6" margin="11" />
+ <pixmapfunction></pixmapfunction>
+ <resources>
+   <include location="QtHello.qrc"/>
+ </resources>
+ <connections/>
+</UI>
