@@ -1,6 +1,6 @@
 ﻿#include "QtHello.hpp"
 #include <QtWidgets/QApplication>
-
+//测试git
 
 int main(int argc, char *argv[])
 {
