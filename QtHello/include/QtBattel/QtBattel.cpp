@@ -2,7 +2,7 @@
 //QtBattel是用来显示战斗界面的
 QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string littleimgPath) {
 	
-	
+	turn_num = 0;
 	window = new QWidget(nullptr);
 	window->setFixedSize(QSize(960, 768));
 	
@@ -13,7 +13,17 @@ QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string litt
 	double PercentHeight = window->height() / 810.0;
 	double PercentWidth = window->width() / 1440.0;
 
-	//上方的血条布局
+	//回合数
+	turnLabel = new QLabel(window);
+	
+	std::string turn_string = std::to_string(turn_num);
+	turnLabel->setText(turn_string.data());
+	turnLabel->setFont(QFont("宋体", 18, 100, true));
+	QSize turnLabelSize(QFontMetrics(QFont("宋体", 18, 100)).boundingRect(turn_string.data()).width()+20, QFontMetrics(QFont("宋体", 12, 100)).height()+20);
+	turnLabel->setFixedSize(turnLabelSize);
+	turnLabel->move(690*PercentWidth,45*PercentHeight);
+
+	//上方的血条蓝条布局
 
 	bloodLabel1 = new QLabel("HP: ", window);	
 	bloodLabel1->setFixedSize(QSize(540*PercentWidth, 90*PercentHeight));
@@ -65,7 +75,7 @@ QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string litt
 	characterLabel2->move(990*PercentWidth, 200*PercentHeight);
 	//设置图片
 	charactermov1 = new QMovie("imgs\\Skadi1.gif");
-	charactermov2 = new QMovie("Dimgs\\Tom.gif");
+	charactermov2 = new QMovie("imgs\\Tom.gif");
 	charactermov1->resized(QSize(300 * PercentWidth, 400 * PercentHeight));
 	charactermov2->resized(QSize(300 * PercentWidth, 400 * PercentHeight));
 	charactermov1->start();
@@ -182,7 +192,30 @@ QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string litt
 	//this->bloodImg1->show();
 	window->show();
 }
+void QtBattel::turnIn() {
+	button1->setEnabled(false);//禁止再点击按钮
+	button2->setEnabled(false);
+	button3->setEnabled(false);
+	button4->setEnabled(false);
+}
 
+void QtBattel::turnBegin() {
+	
+	std::string turn_string = std::to_string(turn_num);
+	turnLabel->setText(turn_string.data());
+	turnLabel->setFont(QFont("宋体", 18, 100, true));
+	QSize turnLabelSize(QFontMetrics(QFont("宋体", 18, 100)).boundingRect(turn_string.data()).width() + 20, QFontMetrics(QFont("宋体", 12, 100)).height() + 20);
+	turnLabel->setFixedSize(turnLabelSize);
+
+	button1->setEnabled(true);
+	button2->setEnabled(true);
+	button3->setEnabled(true);
+	button4->setEnabled(true);
+}
+void QtBattel::turnEnd() {
+	turn_num++;
+	turnBegin();
+}
 void setlabelframe(QLabel* q, bool t) {
 	q->setFrameShape(QFrame::Box);
 	q->setFrameShadow(QFrame::Sunken);
@@ -339,6 +372,7 @@ void QtBattel::BloodChange(QLabel*&ChangeLabel,int new_blood1_now) {
 		this->blood1_now = new_blood1_now;
 		delete (this->animation);
 		this->animation = nullptr;
+		this->turnEnd();
 		});
 	animation->start();
 }
@@ -351,6 +385,7 @@ void ShowLabel::button_clicked() {
 	//his->if_use_button = true;
 }
 void QtBattel::button_clicked_new() {
+	this->turnIn();
 	if (this->blood1_now >= 5000)this->BloodChange(this->bloodImg1, this->blood1_now - 2000);
 	else this->BloodChange(this->bloodImg1,this->blood1_now + 1000);
 
@@ -362,89 +397,6 @@ void ShowLabel::setbutton(SkillButton* b) {
 void ShowLabel::readinskill(SkillButton* skill) {
 	this->sname = skill->getSkillName();
 }
-/*
-void ShowLabel::ListInsert(ShowLabel* m, int index) {
-	if (index < 0|| index >this->Length) {
-		return;
-	}
-	if (index == 0) {
-		m->next = this->next;
-		this->next = m;
-		return;
-	}
-	ShowLabel* temp = this->next;
-	for (int i = 0; i < index - 1; i++) {
-		if (temp == nullptr) {
-			return;
-		}
-		temp = temp->next;
-	}
-	m->next = temp->next;
-	temp->next = m;
-	this->Length++;
-}
-void ShowLabel::ListAppend(ShowLabel* m) {
-	ShowLabel* temp = this->next;
-	if (temp == nullptr) {
-		this->next = m;
-		this->Length++;
-		return;
-	}
-	while (temp->next != nullptr) {
-		temp = temp->next;
-	}
-	temp->next = m;
-	this->Length++;
-}
-ShowLabel* ShowLabel::ListGet(int index) {
-	if (index < 0 || index >this->Length) {
-		return nullptr;
-	}
-	ShowLabel* temp = this->next;
-	for (int i = 0; i < index; i++) {
-		if (temp == nullptr) {
-			return nullptr;
-		}
-		temp = temp->next;
-	}
-	return temp;
-}
-ShowLabel* ShowLabel::getNext() {
-	if (this->if_use_button) {
-		Length++;
-		return this->next;
-	}
-	else {
-		return nullptr;
-	}
-}
-void ShowLabel::ListDelete(int index) {
-	if (index < 0 || index >this->Length) {
-		return;
-	}
-	ShowLabel* temp = this->next;
-	for (int i = 0; i < index - 1; i++) {
-		if (temp == nullptr) {
-			return;
-		}
-		temp = temp->next;
-	}
-	ShowLabel* del = temp->next;
-	temp->next = del->next;
-	delete del;
-	this->Length--;
-}
-void ShowLabel::ListClear() {
-	ShowLabel* temp = this->next;
-	while (temp != nullptr) {
-		ShowLabel* del = temp;
-		temp = temp->next;
-		delete del;
-	}
-	this->next = nullptr;
-	this->Length = 0;
-}
-*/
 //SkillButton是用来显示技能信息的
 SkillButton::SkillButton(QWidget* parent) :QCommandLinkButton(parent) {
 	this->skillcost = 0;

@@ -24,6 +24,9 @@ private:
 	QPropertyAnimation* animation;
 	int blood1_now = 500, blood1_max = 10000;//之后接入角色类（Defence后直接对Defence进行修改）
 	QWidget* window;
+	QLabel* turnLabel;
+
+	int turn_num;
 	void BloodChange(QLabel* &ChangeLabel,int new_blood1_now);
 	void button_clicked_new();
 	QVBoxLayout* mainLayout;
@@ -67,6 +70,9 @@ private:
 	QScrollArea* scrollArea;
 
 	//判断战斗是否结束
+	void turnIn();
+	void turnBegin();
+	void turnEnd();
 	bool if_fight_over = false;
 };
 //MyLabel是用来显示战斗信息的
