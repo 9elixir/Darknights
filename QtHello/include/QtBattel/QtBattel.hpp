@@ -105,6 +105,9 @@ public:
 	void setFont_height(int FONT_HEIGHT);
 	void setMyWidth(int WIDTH);
 	void setMyHeight(int Height);
+	void setSkillEffect(const QString& effect);
+	QString getSkillEffect();
+
 	~ShowLabel();
 private:
 	const int swidth = 50;
@@ -122,6 +125,8 @@ private:
 	QString hurt = QString("114514");
 	QString discription = "";
 	QString show = "";
+	QString skilleffect = "null";
+
 	ShowLabel* next;
 	SkillButton* button = nullptr;
 };
@@ -141,12 +146,10 @@ public:
 	void setSkillType(const QString& type);
 	void setSkillLevel(const QString& level);
 	void setSkillRange(const QString& range);
-	void setSkillEffect(const QString& effect);
 	QString getSkillName();
 	QString getSkillAttribute();
 	QString getSkillType();
 	QString getSkillRange();
-	QString getSkillEffect();
 	int getSkillCost();
 	int getSkillHurt();
 	int getSkillLevel();
@@ -159,7 +162,6 @@ private:
 	QString skillattribute;
 	QString skilltype;
 	QString skillrange;
-	QString skilleffect;
 
 signals:
 	void myclicked(int i = 0);

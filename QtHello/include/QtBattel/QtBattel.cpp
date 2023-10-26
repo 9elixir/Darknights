@@ -28,10 +28,10 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 
 	//模拟传入人物的指针
 	this->defence = new Defences{};
-	Skill* s1 = new Skill{ 0 , 10 ,QString("强力击") };
-	Skill* s2 = new Skill{ 20, 50, QString("跃浪击") };
-	Skill* s3 = new Skill{ 40, 100, QString("狂风斩") };
-	Skill* s4 = new Skill{ 80, 200, QString("破空斩") };
+	Skill* s1 = new Skill{ 0 , 30 ,QString("几手") };
+	Skill* s2 = new Skill{ 20, 80, QString("冲盈") };
+	Skill* s3 = new Skill{ 40, 150, QString("我无") };
+	Skill* s4 = new Skill{ 80, 300, QString("拂尘") };
 	this->defence->setskill(s1, 1);
 	this->defence->setskill(s2, 2);
 	this->defence->setskill(s3, 3);
@@ -126,10 +126,10 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 
 	// 左侧四分之一的小图片
 	smallImageLabel = new QLabel{ window };
-	QPixmap smallImage(littleimgPath.data()); // 更换为你的图片路径
-	smallImageLabel->setFixedSize(QSize(360 * PercentWidth, 200 * PercentHeight));//确定框的大小，图片只会载入相应位置的内容
+	QPixmap smallImage("imgs\\Chongyue\\Chongyue.png"); // 更换为你的图片路径
+	smallImageLabel->setFixedSize(QSize(360 * PercentWidth, 200 * PercentHeight));//确定框的大小240x168，图片只会载入相应位置的内容
 	smallImageLabel->move(45 * PercentWidth, 610 * PercentHeight);
-	smallImageLabel->setPixmap(smallImage.scaled(360 * PercentWidth, 200 * PercentHeight));
+	smallImageLabel->setPixmap(smallImage.scaled(360 * PercentWidth, 360 * PercentWidth * 9 / 16));//16：9
 
 
 	// 中间二分之一的按钮布局
@@ -151,10 +151,10 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	button4->move(720 * PercentWidth, 713 * PercentHeight);
 
 	//取消button自带的“->"箭头
-	button1->setIcon(QIcon());
-	button2->setIcon(QIcon());
-	button3->setIcon(QIcon());
-	button4->setIcon(QIcon());
+	button1->setIcon(QIcon("imgs\\Chongyue\\普攻.png"));
+	button2->setIcon(QIcon("imgs\\Chongyue\\技能_冲盈.png"));
+	button3->setIcon(QIcon("imgs\\Chongyue\\技能_我无.png"));
+	button4->setIcon(QIcon("imgs\\Chongyue\\技能_拂尘.png"));
 
 	// 取消焦点，否则按键监听无法使用
 	button1->setFocusPolicy(Qt::NoFocus);
@@ -253,6 +253,18 @@ void QtBattle::BloodChange(QLabel*& ChangeLabel, int now, int max) {
 void QtBattle::button1_clicked()
 {
 	label->setbutton(this->button1);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button1->getSkillHurt()) / double(this->blood2_max);
+
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
 	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
 	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
 
@@ -286,6 +298,18 @@ void QtBattle::button1_clicked()
 void QtBattle::button2_clicked()
 {
 	label->setbutton(this->button2);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button2->getSkillHurt()) / double(this->blood2_max);
+
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
 	this->magic1_now = this->magic1_now - this->button2->getSkillCost();
 	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
 
@@ -318,6 +342,17 @@ void QtBattle::button2_clicked()
 
 void QtBattle::button3_clicked() {
 	label->setbutton(this->button3);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button3->getSkillHurt()) / double(this->blood2_max);
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
 	this->magic1_now = this->magic1_now - this->button3->getSkillCost();
 	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
 
@@ -350,6 +385,17 @@ void QtBattle::button3_clicked() {
 }
 void QtBattle::button4_clicked() {
 	label->setbutton(this->button4);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button4->getSkillHurt()) /double( this->blood2_max);
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
 	this->magic1_now = this->magic1_now - this->button4->getSkillCost();
 	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
 
@@ -433,7 +479,18 @@ void QtBattle::turnBegin() {
 		button4->setEnabled(false);
 
 		this->label->enemyturn();
+		//根据当前技能对敌人伤害的不同确定skilleffct
+		double hurtrate = double(40) / double(this->blood1_max);
 
+		if (hurtrate >= 0.3) {
+			this->label->setSkillEffect("效果拔群！");
+		}
+		else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+			this->label->setSkillEffect("效果显著");
+		}
+		else {
+			this->label->setSkillEffect("效果轻微");
+		}
 		this->blood1_now = this->blood1_now - 40;
 		this->BloodChange(this->bloodImg1, this->blood1_now,this->blood1_max);
 		this->magic2_now = this->magic2_now - 20;
@@ -518,7 +575,6 @@ void ShowLabel::wrap(bool b, int last_count) {
 	{
 		QChar cha = this->discription.at(i);
 		ushort uni = cha.unicode();
-		//QString存储字符串采用的是Unicode码，每一个字符是一个16位的QChar，而不是8位的char，所以Qstring处理中文字符没有问题，而且一个汉字算作是一个字符。
 
 		if (uni == QChar('\n').unicode()) {
 			str = QString("");
@@ -548,6 +604,7 @@ void ShowLabel::wrap(bool b, int last_count) {
 	this->QLabel::setText(this->discription);
 	this->QLabel::setFixedWidth(this->width);
 	this->QLabel::setFixedHeight(contents_rows * (this->font_height + 3));
+
 }
 void ShowLabel::button_clicked() {
 
@@ -555,7 +612,8 @@ void ShowLabel::button_clicked() {
 	this->show = this->cname + QString("%1%2%3%4%5%6%7%8");
 	this->sname = this->button->getSkillName();
 	this->hurt = QString::number(this->button->getSkillHurt());
-	this->setText(show.arg("对").arg(ename).arg("使用了").arg(this->sname).arg("造成了").arg(hurt).arg("点伤害").arg("效果显著"));
+
+	this->setText(show.arg("对").arg(ename).arg("使用了").arg(this->sname).arg("造成了").arg(hurt).arg("点伤害").arg(this->skilleffect));
 	this->wrap(true, last_count);
 
 }
@@ -564,7 +622,7 @@ void ShowLabel::enemyturn() {
 	this->show = this->ename + QString("%1%2%3%4%5%6%7%8");
 	this->sname = "撕扯";
 	this->hurt = QString::number(40);
-	this->setText(show.arg("对").arg(cname).arg("使用了").arg(this->sname).arg("造成了").arg(hurt).arg("点伤害").arg("效果显著"));
+	this->setText(show.arg("对").arg(cname).arg("使用了").arg(this->sname).arg("造成了").arg(hurt).arg("点伤害").arg(this->skilleffect));
 	this->wrap(true, last_count);
 }
 void ShowLabel::setcname(const QString& name) {
@@ -576,7 +634,12 @@ void ShowLabel::setename(const QString& name) {
 void ShowLabel::readinskill(SkillButton* skill) {
 	this->sname = skill->getSkillName();
 }
-
+void ShowLabel::setSkillEffect(const QString& effect) {
+	this->skilleffect = effect;
+}
+QString ShowLabel::getSkillEffect() {
+	return this->skilleffect;
+}
 //SkillButton是用来显示技能信息的
 SkillButton::SkillButton(QWidget* parent) :QCommandLinkButton(parent) {
 	this->skillcost = 0;
@@ -586,7 +649,6 @@ SkillButton::SkillButton(QWidget* parent) :QCommandLinkButton(parent) {
 	this->skilltype = "\0";
 	this->skilllevel = 0;
 	this->skillrange = "\0";
-	this->skilleffect = "\0";
 }
 SkillButton::SkillButton(const QString& text1, const QString& text2, QWidget* parent) : QCommandLinkButton(text1, text2, parent) {
 	this->skillcost = 0;
@@ -596,7 +658,6 @@ SkillButton::SkillButton(const QString& text1, const QString& text2, QWidget* pa
 	this->skilltype = "\0";
 	this->skilllevel = 0;
 	this->skillrange = "\0";
-	this->skilleffect = "\0";
 }
 SkillButton::SkillButton(Skill* s, QWidget* parent) : QCommandLinkButton((s->name + "%1%2").arg(" Hurt: ").arg(s->hurt), QString("Cost : %1").arg(s->cost), parent) {
 	this->skillcost = s->cost;
@@ -606,7 +667,6 @@ SkillButton::SkillButton(Skill* s, QWidget* parent) : QCommandLinkButton((s->nam
 	this->skilltype = "\0";
 	this->skilllevel = 0;
 	this->skillrange = "\0";
-	this->skilleffect = "\0";
 }
 void ShowLabel::setbutton(SkillButton* s) {
 	this->button->setSkillName(s->getSkillName());
@@ -634,9 +694,7 @@ void SkillButton::setSkillLevel(const QString& level) {
 void SkillButton::setSkillRange(const QString& range) {
 	this->skillrange = range;
 }
-void SkillButton::setSkillEffect(const QString& effect) {
-	this->skilleffect = effect;
-}
+
 QString SkillButton::getSkillName() {
 	return this->skillname;
 }
@@ -649,9 +707,7 @@ QString SkillButton::getSkillType() {
 QString SkillButton::getSkillRange() {
 	return this->skillrange;
 }
-QString SkillButton::getSkillEffect() {
-	return this->skilleffect;
-}
+
 int SkillButton::getSkillCost() {
 	return this->skillcost;
 }
