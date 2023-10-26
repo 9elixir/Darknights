@@ -8,7 +8,7 @@
 #include<qevent.h>//Qkeyevent
 #include<map>
 #include"include/init/init.hpp"
-#include"include/Defences/Defences.hpp"
+//#include"include/Defences/Defences.hpp"
 #include"include/QtBattel/QtBattel.hpp"
 #include "ui_QtHello.h"
 

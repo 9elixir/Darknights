@@ -220,7 +220,7 @@ bool QtHello::updateMan() {
 
 void QtHello::OpenBattle() {
     myMessage("Open Battle", "lets Battle!");
-    QtBattel* my_battle =new QtBattel(this);
+    QtBattle* my_battle =new QtBattle(this);
 }
 
 
