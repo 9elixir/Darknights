@@ -1,6 +1,7 @@
 #pragma once
 #include"Enemy.h"
 #include"move.h"
+//距离计算
 double distance(double x1, double y1, double x2, double y2)
 {
 	double dx = x1 - x2;
@@ -8,6 +9,7 @@ double distance(double x1, double y1, double x2, double y2)
 	double distance = sqrt(dx * dx + dy * dy);
 	return distance;
 }
+//怪物巡逻函数，依次设定巡逻怪物，怪物起始地xy值，结束地xy值
 void patrol(Enemy& e, double ex1, double ey1, double ex2, double ey2)
 {
 	e.ex = ex1;

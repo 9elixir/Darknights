@@ -1,9 +1,11 @@
 #pragma once
 #include"Enemy.h"
+//移动中位置
 double lerp(double start, double end, double t)
 {
 	return start + (end - start) * t;
 }
+//怪物移动
 void move(Enemy& e, double x, double y, double time)
 {
 	double dx = x - e.ex;

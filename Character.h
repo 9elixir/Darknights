@@ -1,4 +1,5 @@
 #pragma once
+//½ÇÉ«Àà
 class Character
 {
 public:

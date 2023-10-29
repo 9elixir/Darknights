@@ -4,7 +4,7 @@
 #include"Enemy.h"
 #include"Character.h"
 #include"move.h"
-
+//A*算法，用以计算怪物追击玩家时最短路径
 #define MAX_X 100  // Map的最大宽度  
 #define MAX_Y 100  // Map的最大长度  
 #define MAX_OBSTACLES 100  // 最大障碍物数  
@@ -22,7 +22,8 @@ typedef struct
 
 Node map[MAX_X][MAX_Y];  // 地形图，每个点有一个x,y坐标、一个cost值和一个parent_index值  
 int obstacle_list[MAX_OBSTACLES][2];  // 障碍物列表，每个障碍物由其左上角的x,y坐标表示  
-Node start, end;  // 起点和终点  
+Node start;  // 起点和终点
+Node End;
 long long path[MAX_PATH_LENGTH];  // 保存搜索到的最短路径  
 int path_length = 0;  // 当前最短路径的长度  
 
@@ -52,7 +53,7 @@ void astar(Enemy& e,Character c)
 //    start.x = end.x = 0;
 //    start.y = end.y = 0;
     start.cost = 0;
-    end.cost = INT_MAX;
+    End.cost = INT_MAX;
     memset(map, 0x3f, sizeof(map));  // 将所有点的cost初始化为一个大的值  
 
     Node* current = &start;
@@ -78,8 +79,8 @@ void astar(Enemy& e,Character c)
                 }
             }
         }
-        move(e, c.cx, c.cy, path_length / e.speed);
-        if (current == &end) break;  // 如果到达终点，结束搜索  
+        move(e, c.cx, c.cy, path_length / e.speed);//怪物移动过去
+        if (current == &End) break;  // 如果到达终点，结束搜索  
         current = map[current->parent_index];  // 回溯到上一个节点，继续搜索  
     }
 }
