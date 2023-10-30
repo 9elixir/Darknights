@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/box.png</file>
+        <file>img/magic wand.png</file>
+        <file>img/grass.png</file>
+        <file>img/mushroom.png</file>
+        <file>img/road.png</file>
+        <file>img/shallowGrass.png</file>
+        <file>img/Tree.png</file>
+        <file>img/waterBody.png</file>
+        <file>img/waterEdgeDown.png</file>
+        <file>img/waterEdgeLeft.png</file>
+        <file>img/waterEdgeUpRight.png</file>
+        <file>img/waterEdgeUpLeft.png</file>
+    </qresource>
+</RCC>
