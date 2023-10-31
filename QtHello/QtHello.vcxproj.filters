@@ -29,21 +29,18 @@
     <QtUic Include="QtHello.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="QtHello.hpp">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClCompile Include="QtHello.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="include\Defences\Defences.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="include\init\init.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\Defences\Defences.cpp">
+    <ClCompile Include="QtHello.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="include\QtBattel\QtBattel.cpp">
@@ -51,6 +48,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Defences\Defences.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\init\init.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="QtHello.hpp">
+      <Filter>Header Files</Filter>
+    </QtMoc>
     <QtMoc Include="include\QtBattel\QtBattel.hpp">
       <Filter>Header Files</Filter>
     </QtMoc>

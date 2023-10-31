@@ -1,52 +1,89 @@
 ﻿#include"QtBattel.hpp"
+
 //QtBattel是用来显示战斗界面的
-QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string littleimgPath) {
-	
+QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string littleimgPath) {
+	//初始化变量
 	turn_num = 0;
-	window = new QWidget(nullptr);
+
+	animation = nullptr;
+	bloodImg2 = nullptr;
+
+	window = new QWidget(nullptr);//吃了大亏
 	window->setFixedSize(QSize(960, 768));
-	
 	window->setWindowFlags(Qt::WindowMinimizeButtonHint);//只允许最小化
 
 	scrollArea = nullptr;
 
-	double PercentHeight = window->height() / 810.0;
-	double PercentWidth = window->width() / 1440.0;
+	double PercentHeight = window->height() / 810.0;//0.84
+	double PercentWidth = window->width() / 1440.0;//0.67
 
-	//回合数
+	//回合显示
 	turnLabel = new QLabel(window);
-	
-	std::string turn_string = std::to_string(turn_num);
-	turnLabel->setText(turn_string.data());
+	QString turn_string = QString::number(turn_num);
+	turnLabel->setText(turn_string);
 	turnLabel->setFont(QFont("宋体", 18, 100, true));
-	QSize turnLabelSize(QFontMetrics(QFont("宋体", 18, 100)).boundingRect(turn_string.data()).width()+20, QFontMetrics(QFont("宋体", 12, 100)).height()+20);
+	QSize turnLabelSize(QFontMetrics(QFont("宋体", 18, 100)).boundingRect(turn_string).width() + 20, QFontMetrics(QFont("宋体", 12, 100)).height() + 20);
 	turnLabel->setFixedSize(turnLabelSize);
-	turnLabel->move(690*PercentWidth,45*PercentHeight);
+	turnLabel->move(690 * PercentWidth, 45 * PercentHeight);
 
-	//上方的血条蓝条布局
-
-	bloodLabel1 = new QLabel("HP: ", window);	
-	bloodLabel1->setFixedSize(QSize(540*PercentWidth, 90*PercentHeight));
+	//模拟传入人物的指针
+	this->defence = new Defences{};
+	Skill* s1 = new Skill{ 0 , 30 ,QString("几手") };
+	Skill* s2 = new Skill{ 20, 80, QString("冲盈") };
+	Skill* s3 = new Skill{ 40, 150, QString("我无") };
+	Skill* s4 = new Skill{ 80, 1500, QString("拂尘") };//dedbug用
+	this->defence->setskill(s1, 1);
+	this->defence->setskill(s2, 2);
+	this->defence->setskill(s3, 3);
+	this->defence->setskill(s4, 4);
+	this->defence->setname("重岳");
+	//上方的血条布局
+	bloodLabel1 = new QLabel("HP: ", window);
+	bloodLabel1->setFixedSize(QSize(540 * PercentWidth, 90 * PercentHeight));
 	bloodLabel1->move(0, 0);
-	
-	std::string bloodpix_path= "BaseImages\\blood.png";
-	bloodImg1 = new QLabel(window);
-	QPixmap bloodpix(bloodpix_path.data());
-	if (bloodpix.isNull())bloodLabel1->setText("HPLOAD WRONG");
-	QSize qsizeblood(440 * PercentWidth*(this->blood1_now * 1.0 / this->blood1_max), 90*PercentHeight);//label总共540，前100不用
-	bloodImg1->setPixmap(bloodpix.scaled(qsizeblood));
-	bloodImg1->setFixedSize(qsizeblood);
-	bloodImg1->move(100*PercentWidth, 0*PercentHeight);
-
-	magicLabel1 = new QLabel("MP: ", window);
-	magicLabel1->setFixedSize(QSize(540*PercentWidth, 90*PercentHeight));
-	magicLabel1->move(0*PercentWidth, 90*PercentHeight);
 	bloodLabel2 = new QLabel("HP: ", window);
 	bloodLabel2->setFixedSize(QSize(540 * PercentWidth, 90 * PercentHeight));
-	bloodLabel2->move(900*PercentWidth, 0*PercentHeight);
+	bloodLabel2->move(900 * PercentWidth, 0 * PercentHeight);
+	std::string bloodpix_path1 = "BaseImages\\blood1.png";
+	std::string bloodpix_path2 = "BaseImages\\blood2.png";
+	bloodImg1 = new QLabel(window);
+	bloodImg2 = new QLabel(window);
+	QPixmap bloodpix1(bloodpix_path1.data());
+	QPixmap bloodpix2(bloodpix_path2.data());
+	if (bloodpix1.isNull())bloodLabel1->setText("HPLOAD WRONG");
+	if (bloodpix2.isNull())bloodLabel2->setText("HPLOAD WRONG");
+	QSize qsizeblood1(440 * PercentWidth * (this->blood1_now * 1.0 / this->blood1_max), 90 * PercentHeight);//label总共540，前100不用
+	QSize qsizeblood2(440 * PercentWidth * (this->blood2_now * 1.0 / this->blood2_max), 90 * PercentHeight);//label总共540，前100不用
+	bloodImg1->setPixmap(bloodpix1.scaled(qsizeblood1));
+	bloodImg1->setFixedSize(qsizeblood1);
+	bloodImg1->move(100 * PercentWidth, 0 * PercentHeight);
+	bloodImg2->setPixmap(bloodpix2.scaled(qsizeblood2));
+	bloodImg2->setFixedSize(qsizeblood2);
+	bloodImg2->move(1000 * PercentWidth, 0 * PercentHeight);
+
+	//上方蓝条布局
+	magicLabel1 = new QLabel("MP: ", window);
+	magicLabel1->setFixedSize(QSize(540 * PercentWidth, 90 * PercentHeight));
+	magicLabel1->move(0 * PercentWidth, 90 * PercentHeight);
 	magicLabel2 = new QLabel("MP: ", window);
 	magicLabel2->setFixedSize(QSize(540 * PercentWidth, 90 * PercentHeight));
-	magicLabel2->move(900*PercentWidth, 90*PercentHeight);
+	magicLabel2->move(900 * PercentWidth, 90 * PercentHeight);
+	QString magicpix_path1 = QString("BaseImages\\magic1.png");
+	QString magicpix_path2 = QString("BaseImages\\magic2.png");
+	magicImg1 = new QLabel(window);
+	magicImg2 = new QLabel(window);
+	QPixmap magicpix1(magicpix_path1);
+	QPixmap magicpix2(magicpix_path2);
+	if (magicpix1.isNull())magicLabel1->setText("MPLOAD WRONG");
+	if (magicpix2.isNull())magicLabel2->setText("MPLOAD WRONG");
+	QSize qsizemagic1(440 * PercentWidth * (this->magic1_now * 1.0 / this->magic1_max), 90 * PercentHeight);//label总共540，前100不用
+	QSize qsizemagic2(440 * PercentWidth * (this->magic2_now * 1.0 / this->magic2_max), 90 * PercentHeight);//label总共540，前100不用
+	magicImg1->setPixmap(magicpix1.scaled(qsizemagic1));
+	magicImg1->setFixedSize(qsizemagic1);
+	magicImg1->move(100 * PercentWidth, 90 * PercentHeight);
+	magicImg2->setPixmap(magicpix2.scaled(qsizemagic2));
+	magicImg2->setFixedSize(qsizemagic2);
+	magicImg2->move(1000 * PercentWidth, 90 * PercentHeight);
 
 	//设置字体形式大小和对齐方式
 	bloodLabel1->setFont(QFont("宋体", 14, 100, true));
@@ -54,7 +91,7 @@ QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string litt
 	magicLabel1->setFont(QFont("宋体", 14, 100, true));
 	magicLabel2->setFont(QFont("宋体", 14, 100, true));
 
-	bloodLabel1->setContentsMargins(40*PercentWidth, 10*PercentHeight, 0*PercentWidth, 0*PercentHeight);
+	bloodLabel1->setContentsMargins(40 * PercentWidth, 10 * PercentHeight, 0 * PercentWidth, 0 * PercentHeight);
 	bloodLabel2->setContentsMargins(40 * PercentWidth, 10 * PercentHeight, 0 * PercentWidth, 0 * PercentHeight);
 	magicLabel1->setContentsMargins(40 * PercentWidth, 10 * PercentHeight, 0 * PercentWidth, 0 * PercentHeight);
 	magicLabel2->setContentsMargins(40 * PercentWidth, 10 * PercentHeight, 0 * PercentWidth, 0 * PercentHeight);
@@ -69,15 +106,14 @@ QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string litt
 	characterLabel1 = new QLabel{ window };
 	characterLabel2 = new QLabel{ window };
 
-	characterLabel1->setFixedSize(QSize(300*PercentWidth, 400*PercentHeight));
-	characterLabel1->move(150*PercentWidth, 200*PercentHeight);
+	characterLabel1->setFixedSize(QSize(300 * PercentWidth, 400 * PercentHeight));
+	characterLabel1->move(150 * PercentWidth, 200 * PercentHeight);
 	characterLabel2->setFixedSize(QSize(300 * PercentWidth, 400 * PercentHeight));
-	characterLabel2->move(990*PercentWidth, 200*PercentHeight);
+	characterLabel2->move(990 * PercentWidth, 200 * PercentHeight);
 	//设置图片
-	charactermov1 = new QMovie("imgs\\Skadi1.gif");
+	charactermov1 = new QMovie("imgs\\Chongyue\\CY-Idle.gif");
 	charactermov2 = new QMovie("imgs\\Tom.gif");
-	charactermov1->resized(QSize(300 * PercentWidth, 400 * PercentHeight));
-	charactermov2->resized(QSize(300 * PercentWidth, 400 * PercentHeight));
+
 	charactermov1->start();
 	charactermov2->start();
 	characterLabel1->setMovie(charactermov1);
@@ -90,37 +126,35 @@ QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string litt
 
 	// 左侧四分之一的小图片
 	smallImageLabel = new QLabel{ window };
-	QPixmap smallImage(littleimgPath.data()); // 更换为你的图片路径
-	smallImageLabel->setFixedSize(QSize(360*PercentWidth, 200*PercentHeight));//确定框的大小，图片只会载入相应位置的内容
-	smallImageLabel->move(45*PercentWidth, 610*PercentHeight);
-	
-	//smallImageLabel->setPixmap(smallImage.scaledToWidth(360));
-	//smallImageLabel->setPixmap(smallImage.scaledToHeight(200));
-	smallImageLabel->setPixmap(smallImage.scaled(360*PercentWidth,200*PercentHeight));
+	QPixmap smallImage("imgs\\Chongyue\\Chongyue.png"); // 更换为你的图片路径
+	smallImageLabel->setFixedSize(QSize(360 * PercentWidth, 200 * PercentHeight));//确定框的大小240x168，图片只会载入相应位置的内容
+	smallImageLabel->move(45 * PercentWidth, 610 * PercentHeight);
+	smallImageLabel->setPixmap(smallImage.scaled(360 * PercentWidth, 360 * PercentWidth * 9 / 16));//16：9
 
 
 	// 中间二分之一的按钮布局
 
-	button1 = new SkillButton("技能 1", "MP : 1", window);
-	button2 = new SkillButton("技能 2", "Mp : 2", window);
-	button3 = new SkillButton("技能 3", "Mp : 3", window);
-	button4 = new SkillButton("技能 4", "Mp : 4", window);
+	button1 = new SkillButton(this->defence->getskill(1), window);
+	button2 = new SkillButton(this->defence->getskill(2), window);
+	button3 = new SkillButton(this->defence->getskill(3), window);
+	button4 = new SkillButton(this->defence->getskill(4), window);
+
 
 	//设置按钮大小和位置
-	button1->setFixedSize(QSize(270*PercentWidth, 90*PercentHeight));
-	button1->move(405*PercentWidth, 617 * PercentHeight);
+	button1->setFixedSize(QSize(270 * PercentWidth, 90 * PercentHeight));
+	button1->move(405 * PercentWidth, 617 * PercentHeight);
 	button2->setFixedSize(QSize(270 * PercentWidth, 90 * PercentHeight));
-	button2->move(720*PercentWidth, 617 * PercentHeight);
+	button2->move(720 * PercentWidth, 617 * PercentHeight);
 	button3->setFixedSize(QSize(270 * PercentWidth, 90 * PercentHeight));
-	button3->move(405* PercentWidth, 713*PercentHeight);
+	button3->move(405 * PercentWidth, 713 * PercentHeight);
 	button4->setFixedSize(QSize(270 * PercentWidth, 90 * PercentHeight));
-	button4->move(720* PercentWidth, 713*PercentHeight);
+	button4->move(720 * PercentWidth, 713 * PercentHeight);
 
 	//取消button自带的“->"箭头
-	button1->setIcon(QIcon());
-	button2->setIcon(QIcon());
-	button3->setIcon(QIcon());
-	button4->setIcon(QIcon());
+	button1->setIcon(QIcon("imgs\\Chongyue\\普攻.png"));
+	button2->setIcon(QIcon("imgs\\Chongyue\\技能_冲盈.png"));
+	button3->setIcon(QIcon("imgs\\Chongyue\\技能_我无.png"));
+	button4->setIcon(QIcon("imgs\\Chongyue\\技能_拂尘.png"));
 
 	// 取消焦点，否则按键监听无法使用
 	button1->setFocusPolicy(Qt::NoFocus);
@@ -131,217 +165,64 @@ QtBattel::QtBattel(QWidget* parent, std::string BattelBackPath, std::string litt
 
 	//右侧四分之一的标签布局
 	label = new ShowLabel("战斗开始！", window);
-
-	//label = new MyLabel("111111111122222222223333333333444444444455555555556666666666");
-	/*
-	label1 = new ShowLabel("1", window);
-	label2 = new ShowLabel(" 2", window);
-	label3 = new ShowLabel("  3", window);
-	label4 = new ShowLabel("   4", window);
-
-	label1->readinskill(button1);
-	label2->readinskill(button2);
-	label3->readinskill(button3);
-	label4->readinskill(button4);
-	*/
-	//label->setText("2");
 	label->setFont(QFont("宋体", 12, 100));//12号字体汉字，刚好能在420的宽度下显示25个；14号字体数字，加粗刚好能在420的宽度下显示50个
 	label->setAlignment(Qt::AlignTop | Qt::AlignLeft);//设置文字对齐方式
-	label->setFont_height (QFontMetrics(QFont("宋体", 12, 100)).height());
+	label->setFont_height(QFontMetrics(QFont("宋体", 12, 100)).height());
 	label->setMyHeight(200 * PercentHeight);
 	label->setMyWidth(400 * PercentWidth);
-	//int usetime = 0;
-	connect(button1, &SkillButton::clicked, this, &QtBattel::button_clicked_new);
+
+	//获取按下的Skillbutton
+
+	connect(button1, &SkillButton::clicked, this, &QtBattle::button1_clicked);
 	connect(button1, &SkillButton::clicked, label, &ShowLabel::button_clicked);
-	connect(button2, &SkillButton::clicked, this, &QtBattel::button_clicked_new);
+
+
+	connect(button2, &SkillButton::clicked, this, &QtBattle::button2_clicked);
 	connect(button2, &SkillButton::clicked, label, &ShowLabel::button_clicked);
-	connect(button3, &SkillButton::clicked, this, &QtBattel::button_clicked_new);
+
+
+	connect(button3, &SkillButton::clicked, this, &QtBattle::button3_clicked);
 	connect(button3, &SkillButton::clicked, label, &ShowLabel::button_clicked);
-	connect(button4, &SkillButton::clicked, this, &QtBattel::button_clicked_new);
+
+
+	connect(button4, &SkillButton::clicked, this, &QtBattle::button4_clicked);
 	connect(button4, &SkillButton::clicked, label, &ShowLabel::button_clicked);
 
 
-	//int i = 0;//一个简陋计时器
-	/*while (!if_fight_over) {
-
-		connect(button1, &SkillButton::clicked, label, &ShowLabel::button_clicked);
-		connect(button2, &SkillButton::clicked, label, &ShowLabel::button_clicked);
-		connect(button3, &SkillButton::clicked, label, &ShowLabel::button_clicked);
-		connect(button4, &SkillButton::clicked, label, &ShowLabel::button_clicked);
-		//temp->ListAppend(temp->getNext());
-		//temp = temp->getNext();
-		i++;
-		if (i == 5) {
-			if_fight_over = true;
-		}
-	}*/
 
 	//右侧四分之一的滚动区域布局
 	QScrollArea* scrollArea = new QScrollArea{ window };
 	scrollArea->setBackgroundRole(QPalette::Dark);
 	scrollArea->setWidgetResizable(false);
-	scrollArea->setFixedSize(QSize(420*PercentWidth, 200*PercentHeight));
-	scrollArea->move(1020*PercentWidth, 610*PercentHeight);
+	scrollArea->setFixedSize(QSize(420 * PercentWidth, 200 * PercentHeight));
+	scrollArea->move(1020 * PercentWidth, 610 * PercentHeight);
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	int barheight = scrollArea->verticalScrollBar()->height();
 	qDebug() << "VBar:" << scrollArea->verticalScrollBar()->width() << " " << scrollArea->verticalScrollBar()->height();
 	qDebug() << "HBar:" << scrollArea->horizontalScrollBar()->width() << " " << scrollArea->horizontalScrollBar()->height();
-	label->setMyWidth(scrollArea->width() - barheight +10);//无论怎样跳绳大小，水平和垂直都是100宽 30高。为什么垂直的滚条宽比高大? 加10是因为实际应用中label还是没占满剩余位置
+	label->setMyWidth(scrollArea->width() - barheight + 10);//无论怎样跳绳大小，水平和垂直都是100宽 30高。为什么垂直的滚条宽比高大? 加10是因为实际应用中label还是没占满剩余位置
 	scrollArea->setWidget(label);
-	//this->bloodImg1->show();
+
 	window->show();
 }
-void QtBattel::turnIn() {
-	button1->setEnabled(false);//禁止再点击按钮
-	button2->setEnabled(false);
-	button3->setEnabled(false);
-	button4->setEnabled(false);
+void QtBattle::setFather(QtHello*father) {
+	this->father_window = father;
 }
-
-void QtBattel::turnBegin() {
-	
-	std::string turn_string = std::to_string(turn_num);
-	turnLabel->setText(turn_string.data());
-	turnLabel->setFont(QFont("宋体", 18, 100, true));
-	QSize turnLabelSize(QFontMetrics(QFont("宋体", 18, 100)).boundingRect(turn_string.data()).width() + 20, QFontMetrics(QFont("宋体", 12, 100)).height() + 20);
-	turnLabel->setFixedSize(turnLabelSize);
-
-	button1->setEnabled(true);
-	button2->setEnabled(true);
-	button3->setEnabled(true);
-	button4->setEnabled(true);
+void QtBattle::setdefence(Defences* defence) {
+	this->defence = defence;
 }
-void QtBattel::turnEnd() {
-	turn_num++;
-	turnBegin();
-}
-void setlabelframe(QLabel* q, bool t) {
-	q->setFrameShape(QFrame::Box);
-	q->setFrameShadow(QFrame::Sunken);
-	q->setStyleSheet("border-width: 1px;border-style: solid;backgroundcolor:rgb(255,255,255);border-color: rgb(0, 0, 0);");
-
-}
-
-//ShowLabel是用来显示战斗信息的
-ShowLabel::ShowLabel(QWidget* parent) :QLabel(parent) {
-	this->next = nullptr;
-	this->discription = "\0";
-	this->contents_rows = 1;
-	this->QLabel::setFixedSize(this->width, this->height);
-	this->if_use_button = false;
-}
-ShowLabel::ShowLabel(const QString& text, QWidget* parent) : QLabel(text, parent) {
-	this->next = nullptr;
-	this->discription = text;
-	this->QLabel::setFixedSize(this->width, this->height);
-	this->setFont(QFont("宋体", 12, 100));//12号字体汉字，刚好能在420的宽度下显示25个；14号字体数字，加粗刚好能在420的宽度下显示50个
-	this->contents_rows = 1;
-	this->wrap(true,0);//自动换行
-	this->setAlignment(Qt::AlignTop | Qt::AlignLeft);//设置文字对齐方式
-	this->move(this->originx, this->originy);
-	this->if_use_button = false;
-}
-ShowLabel::~ShowLabel() {
-	delete this->next;
-}
-void ShowLabel::setFont_height(int FONT_HEIGHT) {
-	this->font_height = FONT_HEIGHT;
-}
-void ShowLabel::setMyHeight(int HEIGHT) {
-	this->height = HEIGHT;
-}
-void ShowLabel::setMyWidth(int WIDTH) {
-	this->width = WIDTH;
-}
-void ShowLabel::setText(const QString& text) {
-	this->discription = this->discription + QString("\n")+text;
-	this->setFont(QFont("宋体", 12, 100));//12号字体汉字，刚好能在420的宽度下显示25个；14号字体数字，加粗刚好能在420的宽度下显示50个
-	this->setAlignment(Qt::AlignTop | Qt::AlignLeft);//设置文字对齐方式
-	this->QLabel::setText(this->discription);
-}
-
-void ShowLabel::setNext(ShowLabel* next) {
-	this->next = next;
-}
-void ShowLabel::wrap(bool b,int last_count) {
-	if (!b) {
-		return;
-	}
-	
-	int sumwidth = 0;
-	QString str("");
-	int nCount = this->discription.count();
-	for (int i = last_count; i < discription.count(); i++)
-	{
-		QChar cha = this->discription.at(i);
-		ushort uni = cha.unicode();
-		//QString存储字符串采用的是Unicode码，每一个字符是一个16位的QChar，而不是8位的char，所以Qstring处理中文字符没有问题，而且一个汉字算作是一个字符。
-		/*if (uni >= 0x4E00 && uni <= 0x9FA5)
-		{
-			sumwidth += this->cwidth;
-			//这个字符是中文
-		}
-		//else if (uni >= 0x0000 && uni <= 0x0009 ) {
-			//sumwidth += this->nwidth;
-		//}
-		else if (uni == QChar('\n').unicode()) {
-			sumwidth = 0;
-			contents_rows++;
-			continue;
-		}
-		else {
-			sumwidth += this->nwidth;
-		}*/
-		/*if (i > 1) {
-			if ( sumwidth >= (this->swidth)|| ( (cha == QString("害")) && this->discription.at(i - 1) == QString("伤") ) ) {
-				if (i + 1 < this->discription.size()&&this->discription.at(i+1)!='\n')
-				{
-					this->discription.insert(i + 1, QString("\n"));
-					sumwidth = 0;
-				}
-				}
-		}*/
-
-		if (uni == QChar('\n').unicode()) {
-			str = QString("");
-			contents_rows++;
-			continue;
-		}
-		str = str + cha;
-		sumwidth = QFontMetrics(QFont("宋体", 12, 100)).boundingRect(str).width();
-		if (i > 1) {
-			qDebug() << str << " " << sumwidth<<" this width="<< this->width;
-			if (sumwidth> (this->width) ) {
-				if (i + 1 < this->discription.size() && this->discription.at(i + 1) == '\n')
-				{
-					continue;
-				}
-				this->discription.insert(i , QString("\n"));
-				sumwidth = 0;
-				i--;
-			}
-			else if ((cha == QString("害")) && this->discription.at(i - 1) == QString("伤")) {
-				this->discription.insert(i+1, QString("\n"));
-			}
-
-		}
-	}
-	
-	this->QLabel::setText(this->discription);
-	this->QLabel::setFixedWidth(this->width);
-	this->QLabel::setFixedHeight(contents_rows* (this->font_height+3));
-}
-void QtBattel::BloodChange(QLabel*&ChangeLabel,int new_blood1_now) {
-
+void QtBattle::BloodChange(QLabel*& ChangeLabel, int now, int max) {
+	//优化bug:蓝条不应该超过最大值也不该低于0，血条不应该高于最大值
+	now = std::max(0, min(now, max));
 	double PercentHeight = window->height() / 810.0;
 	double PercentWidth = window->width() / 1440.0;
-	QSize size1= ChangeLabel->size();
-	QSize size2=size1;
-	int new_width = 440 * PercentWidth * (new_blood1_now*1.0 / this->blood1_max);
+	QSize size1 = ChangeLabel->size();
+	QSize size2 = size1;
+	int new_width = 440 * PercentWidth * (now * 1.0 / max);
 	size2.setWidth(new_width);
-	
-	// 创建属性动画，将 QLabel 的 pixmap 属性从起始图片渐变到目标图片
+
+	//创建属性动画，将 QLabel 的 pixmap 属性从起始图片渐变到目标图片
 	//注意，pixmap不能作为动画的属性
 	//使用geometry只改变geometry，size不会变化，text和pixmap不会随之变化,必须重新手写
 	//若率先使用了fixedSize,geometry则无法改变,因此使用value百分比
@@ -355,47 +236,439 @@ void QtBattel::BloodChange(QLabel*&ChangeLabel,int new_blood1_now) {
 	// 启动动画
 	ChangeLabel->show();
 
-	connect(animation, &QPropertyAnimation::valueChanged, [&ChangeLabel,new_width](const QVariant& value) {
+	connect(animation, &QPropertyAnimation::valueChanged, [&ChangeLabel, new_width](const QVariant& value) {
 		//double Percent = value.toInt() / 100.0;
-		qDebug() << value.toSize();
+		//qDebug() << value.toSize();
 		//int now_width = Percent * (new_width - geo1.width()) + geo1.width();
+		//QPixmap pixmap = ChangeLabel->pixmap().scaledToWidth(now_width);//这里不能单独改变width,会导致height变化
 		int now_width = value.toSize().width();
-		QPixmap pixmap = ChangeLabel->pixmap().scaledToWidth(now_width);
-		//QPixmap pixmap("imgs//interlude_01.png");
+		QPixmap pixmap = ChangeLabel->pixmap().scaled(value.toSize());
 		ChangeLabel->setFixedWidth(now_width);
+		ChangeLabel->setFixedHeight(value.toSize().height());
 		ChangeLabel->setPixmap(pixmap);
-	});
+		});
 
-	connect(animation, &QPropertyAnimation::finished, [&ChangeLabel,new_width,new_blood1_now,this]() {
-		ChangeLabel->setPixmap(ChangeLabel->pixmap().scaledToWidth(new_width));
-		ChangeLabel->setFixedWidth(new_width);
-		this->blood1_now = new_blood1_now;
+	connect(animation, &QPropertyAnimation::finished, [&ChangeLabel, new_width, now, PercentHeight, this]() {
 		delete (this->animation);
 		this->animation = nullptr;
-		this->turnEnd();
 		});
 	animation->start();
 }
+void QtBattle::button1_clicked()
+{
+	label->setbutton(this->button1);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button1->getSkillHurt()) / double(this->blood2_max);
+
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
+	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = std::max(0,min(this->magic1_now, this->magic1_max));
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
+
+	QMovie* attack = new QMovie("imgs\\Chongyue\\CY-Attack_A.gif");
+	this->characterLabel1->setMovie(attack);
+
+	this->button_clicked_new();
+
+	//当动画播放完毕后，删除动画
+	connect(attack, &QMovie::frameChanged, [this, attack] {
+
+		//判断是否是最后一帧
+		if (attack->currentFrameNumber() == attack->frameCount() - 1) {
+
+			this->characterLabel1->setMovie(this->charactermov1);
+			this->charactermov1->start();
+
+			this->blood2_now = this->blood2_now - this->button1->getSkillHurt();
+			this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+			this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
+
+			
+
+			attack->stop();
+			qDebug() << QString("hello");
+			this->turnEnd();
+
+		}
+		});
+
+	attack->start();
+
+}
+void QtBattle::button2_clicked()
+{
+	label->setbutton(this->button2);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button2->getSkillHurt()) / double(this->blood2_max);
+
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
+	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
+
+	QMovie* skill1 = new QMovie("imgs\\Chongyue\\CY-Skill_1.gif");
+	this->characterLabel1->setMovie(skill1);
+
+	this->button_clicked_new();
+
+	//当动画播放完毕后，删除动画
+	connect(skill1, &QMovie::frameChanged, [this, skill1] {
+
+		//判断是否是最后一帧
+		if (skill1->currentFrameNumber() == skill1->frameCount() - 1) {
+
+			this->characterLabel1->setMovie(this->charactermov1);
+			this->charactermov1->start();
+
+			this->blood2_now = this->blood2_now - this->button2->getSkillHurt();
+			this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+			this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
+
+			
+
+			skill1->stop();
+			this->turnEnd();
+
+		}
+		});
+
+	skill1->start();
+}
+
+void QtBattle::button3_clicked() {
+	label->setbutton(this->button3);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button3->getSkillHurt()) / double(this->blood2_max);
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
+	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
+
+	QMovie* skill3 = new QMovie("imgs\\Chongyue\\CY-Skill_3.gif");
+	this->characterLabel1->setMovie(skill3);
+
+	this->button_clicked_new();
+
+	//当动画播放完毕后，删除动画
+	connect(skill3, &QMovie::frameChanged, [this, skill3] {
+
+		//判断是否是最后一帧
+		if (skill3->currentFrameNumber() == skill3->frameCount() - 1) {
+
+			this->characterLabel1->setMovie(this->charactermov1);
+			this->charactermov1->start();
+
+			this->blood2_now = this->blood2_now - this->button3->getSkillHurt();
+			this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+			this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
+
+			
+
+			skill3->stop();
+			this->turnEnd();
+
+		}
+		});
+
+	skill3->start();
+
+}
+void QtBattle::button4_clicked() {
+	label->setbutton(this->button4);
+	//根据当前技能对敌人伤害的不同确定skilleffct
+	double hurtrate = double(this->button4->getSkillHurt()) / double(this->blood2_max);
+	if (hurtrate >= 0.3) {
+		this->label->setSkillEffect("效果拔群！");
+	}
+	else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+		this->label->setSkillEffect("效果显著");
+	}
+	else {
+		this->label->setSkillEffect("效果轻微");
+	}
+	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
+
+	QMovie* skill2b = new QMovie("imgs\\Chongyue\\CY-Skill_2_Begin.gif");
+	QMovie* skill2e = new QMovie("imgs\\Chongyue\\CY-Skill_2_End.gif");
+
+	this->characterLabel1->setMovie(skill2b);
+
+	this->button_clicked_new();
+
+	//当动画播放完毕后，删除动画
+	connect(skill2b, &QMovie::frameChanged, [this, skill2b, skill2e] {
+
+		//判断是否是最后一帧
+		if (skill2b->currentFrameNumber() == skill2b->frameCount() - 1) {
+
+			this->characterLabel1->setMovie(skill2e);
+
+			connect(skill2e, &QMovie::frameChanged, [this, skill2e] {
+
+				//判断是否是最后一帧
+				if (skill2e->currentFrameNumber() == skill2e->frameCount() - 1) {
+
+					this->characterLabel1->setMovie(this->charactermov1);
+					this->charactermov1->start();
+
+					this->blood2_now = this->blood2_now - this->button4->getSkillHurt();
+					this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+					this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
+
+					
+
+					skill2e->stop();
+					this->turnEnd();
+				}
+				});
+
+			skill2e->start();
+			skill2b->stop();
+		}
+		});
+
+	skill2b->start();
+
+}
+void QtBattle::button_clicked_new()
+{
+	this->turnIn();
+	//绑定label和defence的名称
+	this->label->setcname(this->defence->getname());
+	this->label->setename("Tom");
+}
+//在button_clicked_new中调用
+void QtBattle::turnIn() {
+	button1->setEnabled(false);//禁止再点击按钮
+	button2->setEnabled(false);
+	button3->setEnabled(false);
+	button4->setEnabled(false);
+
+}
+//在turnEnd中调用
+void QtBattle::turnBegin() {
+
+	//上方显示回合数
+	std::string turn_string = std::to_string(turn_num);
+	turnLabel->setText(turn_string.data());
+	turnLabel->setFont(QFont("宋体", 18, 100, true));
+	QSize turnLabelSize(QFontMetrics(QFont("宋体", 18, 100)).boundingRect(turn_string.data()).width() + 20, QFontMetrics(QFont("宋体", 12, 100)).height() + 20);
+	turnLabel->setFixedSize(turnLabelSize);
+	if (if_my_turn) {
+		button1->setEnabled(true);
+		button2->setEnabled(true);
+		button3->setEnabled(true);
+		button4->setEnabled(true);
+
+	}
+	//若是敌人回合，敌人采取行动
+	else {
+
+		button1->setEnabled(false);
+		button2->setEnabled(false);
+		button3->setEnabled(false);
+		button4->setEnabled(false);
+
+		this->label->enemyturn();
+		double enemey_hurt=100000;
+		double enemey_cost=20;
+		//根据当前技能对敌人伤害的不同确定skilleffct
+		double hurtrate = double(enemey_hurt) / double(this->blood1_max);
+
+		if (hurtrate >= 0.3) {
+			this->label->setSkillEffect("效果拔群！");
+		}
+		else if (hurtrate >= 0.15 && hurtrate < 0.3) {
+			this->label->setSkillEffect("效果显著");
+		}
+		else {
+			this->label->setSkillEffect("效果轻微");
+		}
+		this->blood1_now = this->blood1_now - enemey_hurt;
+		this->BloodChange(this->bloodImg1, this->blood1_now, this->blood1_max);
+		this->magic2_now = this->magic2_now - enemey_cost;
+		this->BloodChange(this->magicImg2, this->magic2_now, this->magic2_max);
+
+		turnEnd();
+	}
+}
+//在BloodChange中调用
+void QtBattle::turnEnd() {
+	turn_num++;
+	//根据血量判断战斗是否结束
+	if_my_turn = !if_my_turn;
+
+	if (this->blood1_now > 0 && this->blood2_now > 0) {
+		turnBegin();
+	}
+	else if (this->blood1_now <= 0 || this->blood2_now <= 0) {
+		if_fight_over = true;
+		if (this->blood1_now <= 0) {
+			int last_count = label->getsize();
+			label->setText("战斗结束！你输了！");
+			label->wrap(true,last_count);
+			//turnBegin();
+		}
+		else if (this->blood2_now <= 0) {
+			int last_count = label->getsize();
+			label->setText("战斗结束！你赢了！");
+			label->wrap(true, last_count);
+			//turnBegin();
+		}
+		checkwin();
+	}
+
+
+}
+
+//ShowLabel是用来显示战斗信息的
+ShowLabel::ShowLabel(QWidget* parent) :QLabel(parent) {
+	this->next = nullptr;
+	this->discription = "\0";
+	this->contents_rows = 1;
+	this->QLabel::setFixedSize(this->width, this->height);
+	this->if_use_button = false;
+	this->button = new SkillButton();
+}
+ShowLabel::ShowLabel(const QString& text, QWidget* parent) : QLabel(text, parent) {
+	this->discription = text;
+	this->QLabel::setFixedSize(this->width, this->height);
+	this->setFont(QFont("宋体", 12, 100));//12号字体汉字，刚好能在420的宽度下显示25个；14号字体数字，加粗刚好能在420的宽度下显示50个
+	this->contents_rows = 1;
+	this->wrap(true, 0);//自动换行
+	this->setAlignment(Qt::AlignTop | Qt::AlignLeft);//设置文字对齐方式
+	this->move(this->originx, this->originy);
+	this->if_use_button = false;
+	this->button = new SkillButton();
+}
+ShowLabel::~ShowLabel() {
+	//delete this->button;
+	//delete this->next;
+	//继承qt组件会随父亲一起被注销，手写继承也有这效果
+}
+void ShowLabel::setFont_height(int FONT_HEIGHT) {
+	this->font_height = FONT_HEIGHT;
+}
+void ShowLabel::setMyHeight(int HEIGHT) {
+	this->height = HEIGHT;
+}
+void ShowLabel::setMyWidth(int WIDTH) {
+	this->width = WIDTH;
+}
+void ShowLabel::setText(const QString& text) {
+	this->discription = this->discription + QString("\n") + text;
+	this->setFont(QFont("宋体", 12, 100));//12号字体汉字，刚好能在420的宽度下显示25个；14号字体数字，加粗刚好能在420的宽度下显示50个
+	this->setAlignment(Qt::AlignTop | Qt::AlignLeft);//设置文字对齐方式
+	this->QLabel::setText(this->discription);
+}
+void ShowLabel::setNext(ShowLabel* next) {
+	this->next = next;
+}
+void ShowLabel::wrap(bool b, int last_count) {
+	if (!b) {
+		return;
+	}
+
+	int sumwidth = 0;
+	QString str("");
+	int nCount = this->discription.count();
+	for (int i = last_count; i < discription.count(); i++)
+	{
+		QChar cha = this->discription.at(i);
+		ushort uni = cha.unicode();
+
+		if (uni == QChar('\n').unicode()) {
+			str = QString("");
+			contents_rows++;
+			continue;
+		}
+		str = str + cha;
+		sumwidth = QFontMetrics(QFont("宋体", 12, 100)).boundingRect(str).width();
+		if (i > 1) {
+			//qDebug() << str << " " << sumwidth << " this width=" << this->width;
+			if (sumwidth > (this->width)) {
+				if (i + 1 < this->discription.size() && this->discription.at(i + 1) == '\n')
+				{
+					continue;
+				}
+				this->discription.insert(i, QString("\n"));
+				sumwidth = 0;
+				i--;
+			}
+			else if ((cha == QString("害")) && this->discription.at(i - 1) == QString("伤")) {
+				this->discription.insert(i + 1, QString("\n"));
+			}
+
+		}
+	}
+
+	this->QLabel::setText(this->discription);
+	this->QLabel::setFixedWidth(this->width);
+	this->QLabel::setFixedHeight(contents_rows * (this->font_height + 3));
+
+}
 void ShowLabel::button_clicked() {
-	//this->move(this->originx, this->originy);
+
 	int last_count = this->discription.size();
 	this->show = this->cname + QString("%1%2%3%4%5%6%7%8");
-	this->setText(show.arg("对").arg(ename).arg("使用了").arg("韩国的虾米诺手啊奥利安菲冰卧槽冰不许爆冰既是刀冰又是解药").arg("造成了").arg(hurt).arg("点伤害").arg("效果显著"));
-	this->wrap(true,last_count);
-	//his->if_use_button = true;
-}
-void QtBattel::button_clicked_new() {
-	this->turnIn();
-	if (this->blood1_now >= 5000)this->BloodChange(this->bloodImg1, this->blood1_now - 2000);
-	else this->BloodChange(this->bloodImg1,this->blood1_now + 1000);
+	this->sname = this->button->getSkillName();
+	this->hurt = QString::number(this->button->getSkillHurt());
 
-	//qDebug() << "Bar:" << scrollArea->verticalScrollBar()->width() << " " << scrollArea->verticalScrollBar()->height();
+	this->setText(show.arg("对").arg(ename).arg("使用了").arg(this->sname).arg("造成了").arg(hurt).arg("点伤害").arg(this->skilleffect));
+	this->wrap(true, last_count);
+
 }
-void ShowLabel::setbutton(SkillButton* b) {
-	this->button = b;
+void ShowLabel::enemyturn() {
+	int last_count = this->discription.size();
+	this->show = this->ename + QString("%1%2%3%4%5%6%7%8");
+	this->sname = "撕扯";
+	this->hurt = QString::number(40);
+	this->setText(show.arg("对").arg(cname).arg("使用了").arg(this->sname).arg("造成了").arg(hurt).arg("点伤害").arg(this->skilleffect));
+	this->wrap(true, last_count);
+}
+void ShowLabel::setcname(const QString& name) {
+	this->cname = name;
+}
+void ShowLabel::setename(const QString& name) {
+	this->ename = name;
 }
 void ShowLabel::readinskill(SkillButton* skill) {
 	this->sname = skill->getSkillName();
+}
+void ShowLabel::setSkillEffect(const QString& effect) {
+	this->skilleffect = effect;
+}
+int ShowLabel::getsize() {
+	return this->discription.size();
+}
+QString ShowLabel::getSkillEffect() {
+	return this->skilleffect;
 }
 //SkillButton是用来显示技能信息的
 SkillButton::SkillButton(QWidget* parent) :QCommandLinkButton(parent) {
@@ -406,7 +679,6 @@ SkillButton::SkillButton(QWidget* parent) :QCommandLinkButton(parent) {
 	this->skilltype = "\0";
 	this->skilllevel = 0;
 	this->skillrange = "\0";
-	this->skilleffect = "\0";
 }
 SkillButton::SkillButton(const QString& text1, const QString& text2, QWidget* parent) : QCommandLinkButton(text1, text2, parent) {
 	this->skillcost = 0;
@@ -416,7 +688,20 @@ SkillButton::SkillButton(const QString& text1, const QString& text2, QWidget* pa
 	this->skilltype = "\0";
 	this->skilllevel = 0;
 	this->skillrange = "\0";
-	this->skilleffect = "\0";
+}
+SkillButton::SkillButton(Skill* s, QWidget* parent) : QCommandLinkButton((s->name + "%1%2").arg(" Hurt: ").arg(s->hurt), QString("Cost : %1").arg(s->cost), parent) {
+	this->skillcost = s->cost;
+	this->skillname = s->name;
+	this->skillhurt = s->hurt;
+	this->skillattribute = "\0";
+	this->skilltype = "\0";
+	this->skilllevel = 0;
+	this->skillrange = "\0";
+}
+void ShowLabel::setbutton(SkillButton* s) {
+	this->button->setSkillName(s->getSkillName());
+	this->button->setSkillHurt(s->getSkillHurt());
+	this->button->setSkillCost(s->getSkillCost());
 }
 void SkillButton::setSkillName(const QString& name) {
 	this->skillname = name;
@@ -439,9 +724,7 @@ void SkillButton::setSkillLevel(const QString& level) {
 void SkillButton::setSkillRange(const QString& range) {
 	this->skillrange = range;
 }
-void SkillButton::setSkillEffect(const QString& effect) {
-	this->skilleffect = effect;
-}
+
 QString SkillButton::getSkillName() {
 	return this->skillname;
 }
@@ -454,9 +737,7 @@ QString SkillButton::getSkillType() {
 QString SkillButton::getSkillRange() {
 	return this->skillrange;
 }
-QString SkillButton::getSkillEffect() {
-	return this->skilleffect;
-}
+
 int SkillButton::getSkillCost() {
 	return this->skillcost;
 }
@@ -465,4 +746,28 @@ int SkillButton::getSkillHurt() {
 }
 int SkillButton::getSkillLevel() {
 	return this->skilllevel;
+}
+void QtBattle::windowquit() {
+	window->setAttribute(Qt::WA_DeleteOnClose);
+	window->close();
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->close();
+}
+//设置label的边框
+void setlabelframe(QLabel* q, bool t) {
+	q->setFrameShape(QFrame::Box);
+	q->setFrameShadow(QFrame::Sunken);
+	q->setStyleSheet("border-width: 1px;border-style: solid;backgroundcolor:rgb(255,255,255);border-color: rgb(0, 0, 0);");
+
+}
+void QtBattle::checkwin() {
+	if (this->blood1_now <= 0)//主角
+	{
+		this->father_window->myMessage("游戏失败", "请再接再厉");//死了
+		this->father_window->check_alive(0);
+	}
+	if (this->blood2_now<=0) {//对面
+		this->father_window->myMessage("游戏胜利", "您赢得了本场战斗!经验值获得 exp");
+		this->father_window->check_alive(1);
+	}
 }

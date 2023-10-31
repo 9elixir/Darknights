@@ -1,0 +1,10 @@
+0(Grass):mapimgs\\grass.png
+1(Tree):mapimgs\\tree.png
+2(Mushroom):mapimgs\\mushroom.png
+3(Road):mapimgs\\road.png
+4(Shallow):mapimgs\\shallowGrass.png
+5(Body):mapimgs\\waterBody.png
+6(Left):mapimgs\\waterEdgeLeft.png
+7(UpLeft):mapimgs\\waterEdgeUpLeft.png
+8(UpRight):mapimgs\\waterEdgeUpRight.png
+9(Down):mapimgs\\waterEdgeDown.png

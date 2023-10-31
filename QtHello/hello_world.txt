@@ -1,4 +1,4 @@
-0_0(MainMAN_Move_Down_Picture):imgs\\0_1_MainMan_0.png
+0_0(MainMAN_Move_Down):imgs/0_1_MainMan_0.png
 0_1(MainMAN_Move_Down_Picture):imgs\\0_1_MainMan_1.png
 0_1(MainMAN_Move_Down_Picture):imgs\\0_1_MainMan_2.png
 0_1(MainMAN_Move_Down_Picture):imgs\\0_1_MainMan_3.png
