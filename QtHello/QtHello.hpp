@@ -38,7 +38,10 @@ private:
     Mapmsg map;
     QtBattle* my_battle;
     int main_alive;
+    bool updateView2();
     bool updateMan();
+    bool updateViewMap();
+    QPixmap BackPix;
     QLabel* BackPicture_Label;
     QLabel* QLMan;
     QVBoxLayout* BackPicture_layout;

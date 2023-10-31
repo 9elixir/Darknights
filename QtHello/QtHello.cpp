@@ -37,16 +37,17 @@ void QtHello::buildmap() {
 
         }
     }
-    QPixmap result;
-    result=QPixmap::fromImage(targetImage);//返回类型为Qpixmap
-    qDebug() << result;
+    this->BackPix=QPixmap::fromImage(targetImage);//返回类型为Qpixmap
+    qDebug() << this->BackPix;
+
+    QPixmap viewresult=BackPix.copy(0,0,MAP.viewcols*MAP.widthpix,MAP.viewrows*MAP.heightpix);
     //targetImage.save("map.png");
-    this->setFixedSize(width * MAP.widthpix, height * MAP.heightpix);
-    this->BackPicture_Label->setFixedSize(width * MAP.widthpix, height * MAP.heightpix);
+    this->setFixedSize(MAP.viewcols * MAP.widthpix,MAP.viewrows * MAP.heightpix);
+    this->BackPicture_Label->setFixedSize(MAP.viewcols * MAP.widthpix, MAP.viewrows * MAP.heightpix);
     this->BackPicture_Label->setParent(this);
-    this->BackPicture_Label->setPixmap(result);
+    this->BackPicture_Label->setPixmap(viewresult);
     this->BackPicture_Label->move(0, 0);
-    this->BackPicture_Label->setScaledContents(true);
+    //this->BackPicture_Label->setScaledContents(true);
     this->BackPicture_Label->show();
 }
 void QtHello::gameover() {
@@ -233,7 +234,7 @@ void QtHello::keyPressEvent(QKeyEvent* event) {//监听按键
         }
         this->man = new Defences(0, 1, 0, 60, 60, 200, 200, 200);
         this->man->setMap(&(this->map));
-        this->updateMan();
+        this->updateView2();
     }
 
     if (event->key() == Qt::Key_W) {
@@ -246,7 +247,7 @@ void QtHello::keyPressEvent(QKeyEvent* event) {//监听按键
         else {
             this->man->ChangePic(0, 4, 0);
         }
-        this->updateMan();
+        this->updateView2();
     }
     if (event->key() == Qt::Key_S) {
         if (!this->man)return;
@@ -259,7 +260,7 @@ void QtHello::keyPressEvent(QKeyEvent* event) {//监听按键
             this->man->ChangePic(0, 1, 0);
         }
         //this->myMessage("why not move", "why not move");
-        this->updateMan();
+        this->updateView2();
     }
     if (event->key() == Qt::Key_A) {
         if (!this->man)return;
@@ -271,7 +272,7 @@ void QtHello::keyPressEvent(QKeyEvent* event) {//监听按键
         else {
             this->man->ChangePic(0, 2, 0);
         }
-        this->updateMan();
+        this->updateView2();
     }
     if (event->key() == Qt::Key_D) {
         if (!this->man)return;
@@ -283,7 +284,7 @@ void QtHello::keyPressEvent(QKeyEvent* event) {//监听按键
         else {
             this->man->ChangePic(0, 3, 0);
         }
-        this->updateMan();
+        this->updateView2();
     }
 }
 void QtHello::setpicpaths(std::vector<RolePic>PicList) {
@@ -295,10 +296,35 @@ void QtHello::setpicpaths(std::vector<RolePic>PicList) {
     battlebegin->show();
     //  this->myMessage("setPiclist", "success!");
 }
+bool QtHello::updateViewMap() {
+    if (!(this->man)) {
+        qDebug() << "no man so we can not updateViewMap()";
+        return false;
+    }
+    if ((this->map.MapMartix.size()<=0)) {
+        qDebug() << "no MAP so we can not updateViewMap()";
+        return false;
+    }
+    int widthpix = this->map.widthpix, heightpix = this->map.heightpix;
+    int x, y;
+    this->man->get_x_and_y(x, y);
+    QPixmap viewresult=this->BackPix.copy(x,y,this->map.viewcols*widthpix,this->map.viewrows*heightpix);
+    this->setFixedSize(this->map.viewcols * widthpix, this->map.viewrows * heightpix);
+    this->BackPicture_Label->setFixedSize(this->map.viewcols * widthpix, this->map.viewrows * heightpix);
+    this->BackPicture_Label->setParent(this);
+    this->BackPicture_Label->setPixmap(viewresult);
+    this->BackPicture_Label->move(0, 0);
+    //this->BackPicture_Label->setScaledContents(true);
+    this->BackPicture_Label->show();
+    return true;
+}
 bool QtHello::updateMan() {
     int widthpix = this->map.widthpix, heightpix = this->map.heightpix;
     if (!QLMan)QLMan = new QLabel(this);
-    cout << "this->man->person_id=" << this->man->person_id << ",this->man->picType=" << this->man->picType << ",this->man->show_id_now="<<this->man->show_id_now << "\n";
+    //cout << "this->man->person_id=" << this->man->person_id << ",this->man->picType=" << this->man->picType << ",this->man->show_id_now="<<this->man->show_id_now << "\n";
+    int x, y;
+    this->man->get_x_and_y(x, y);
+    cout << "this->man->x=" << x / this->map.widthpix << ",this->man->y=" << y / this->map.heightpix << "\n";
     QPixmap pixmap0((this->RolesPicList[this->man->person_id]).PicList[this->man->picType].pic_paths[this->man->show_id_now].data());//Qpix使用完可以直接销毁，但是Label、Layout不行
     QPixmap pixmap = pixmap0.scaled(widthpix,heightpix);
         if (pixmap.isNull()) {
@@ -313,8 +339,6 @@ bool QtHello::updateMan() {
 
     // 调整 QLabel 的大小以适应图片
     QLMan->setFixedSize(pixmap.size());
-    int x, y;
-    man->get_x_and_y(x, y);
     QLMan->move(x, y);
     QLMan->setScaledContents(true);
     QLMan->show();
@@ -323,7 +347,58 @@ bool QtHello::updateMan() {
     //this->show();
     return true;
 }
+bool QtHello::updateView2() {
+    if (this->map.MapMartix.size() <= 0) {
+        cout << "No Map and We can not update View!\n";
+        return false;
+    }
+    if (!(this->man)) {
+        cout << "No Man and We can not update View!\n";
+        return false;
+    }
+    Mapmsg MAP = this-> map;
+    int r_rows = MAP.viewrows / 2 * MAP.heightpix, r_cols = MAP.viewcols / 2 * MAP.widthpix;
+   // QPixmap temp1=this->BackPix;
+    QImage targetImage(MAP.widthpix*MAP.cols,MAP.heightpix*MAP.rows, QImage::Format_ARGB32);
+    targetImage.fill(Qt::transparent);
+    QPainter painter(&targetImage);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver); //新的覆盖于旧的之上
+    QPixmap pixmapt((this->RolesPicList[this->man->person_id]).PicList[this->man->picType].pic_paths[this->man->show_id_now].data());//Qpix使用完可以直接销毁，但是Label、Layout不行
+    QPixmap pixmap0 = pixmapt.scaled(MAP.widthpix,MAP.heightpix);
+    int x, y;
+    int x0, y0;
+    this->man->get_x_and_y(x, y);
+    this->man->get_x_and_y(x0, y0);
+    painter.drawPixmap(0,0,this->BackPix);
+    painter.drawPixmap(x,y,pixmap0);
 
+    QPixmap temp2 = QPixmap::fromImage(targetImage);
+
+
+    if (x - r_cols < 0) {
+        x = r_cols;
+    }
+    if (y - r_rows < 0) {
+        y = r_rows;
+    }
+    if (x + r_cols > MAP.cols*MAP.widthpix) {
+        x = MAP.cols * MAP.widthpix - r_cols;
+    }
+    if (y + r_rows > MAP.rows * MAP.heightpix) {
+        y = MAP.rows * MAP.heightpix - r_rows;
+    }
+    QPixmap viewresult = temp2.copy(x-r_cols,y-r_rows,r_cols*2,r_rows*2);
+    qDebug() << viewresult << " " << temp2 << " " << x0 << " " << y0<<" "<<x<<" "<<y;
+    this->setFixedSize(r_cols*2, r_rows * 2);
+    this->BackPicture_Label->setFixedSize(r_cols * 2, r_rows * 2);
+    this->BackPicture_Label->setParent(this);
+    this->BackPicture_Label->setPixmap(viewresult);
+    this->BackPicture_Label->move(0, 0);
+    //this->BackPicture_Label->setScaledContents(true);
+    this->BackPicture_Label->show();
+    return true;
+
+}
 void QtHello::OpenBattle() {
     myMessage("Open Battle", "lets Battle!");
     if (this->my_battle) { delete (this->my_battle); this->my_battle = nullptr; }

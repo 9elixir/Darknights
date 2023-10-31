@@ -228,6 +228,7 @@ void init::checkMap() {
 	vector<vector<Mappic> >list=this->map.MapMartix;
 	cout << "rows:" << this->map.rows<<",cols:"<<this->map.cols<<"\n";
 	cout << "heightpix:" << this->map.heightpix << ",widthpix:" << this->map.widthpix << "\n";
+	cout << "viewrows:" << this->map.viewrows << ",viewcols:" << this->map.viewcols<<"\n";
 	for (vector<Mappic>eachline:list) {
 		for (Mappic eachcol : eachline) {
 			cout << eachcol.Pic_type;
@@ -331,7 +332,9 @@ bool init::setMap(std::string map_path,std::string touch_path) {
 
 	this->map.rows = this->map.MapMartix.size();
 	this->map.cols = this->map.MapMartix[0].size();
-	this->map.heightpix = 20, this->map.widthpix = 30;
+	this->map.heightpix = 30, this->map.widthpix = 30;
+	this->map.viewrows = this->map.rows/2, this->map.viewcols = this->map.cols/2;
+	//this->map.viewrows = this->map.rows, this->map.viewcols = this->map.cols;
 	if (this->debug) {
 		checkMaptoollist();
 		checkMap();

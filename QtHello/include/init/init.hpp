@@ -24,6 +24,7 @@ struct Mapmsg {
 	vector<vector<Mappic> >MapMartix;
 	int rows=-1, cols=-1;
 	int widthpix=30, heightpix=30;
+	int viewrows=-1, viewcols=-1;
 };
 struct transmap {
 	vector<Mappic>tools;
