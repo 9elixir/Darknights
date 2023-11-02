@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtHello", "QtHello.vcxproj", "{5983C3B4-F6FC-4A23-A24D-91328DF66C63}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtHello", "QtHello.vcxproj", "{582D6D1E-A8FC-4DD3-9C64-CAF8C0AF4F1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5983C3B4-F6FC-4A23-A24D-91328DF66C63}.Debug|x64.ActiveCfg = Debug|x64
-		{5983C3B4-F6FC-4A23-A24D-91328DF66C63}.Debug|x64.Build.0 = Debug|x64
-		{5983C3B4-F6FC-4A23-A24D-91328DF66C63}.Release|x64.ActiveCfg = Release|x64
-		{5983C3B4-F6FC-4A23-A24D-91328DF66C63}.Release|x64.Build.0 = Release|x64
+		{582D6D1E-A8FC-4DD3-9C64-CAF8C0AF4F1C}.Debug|x64.ActiveCfg = Debug|x64
+		{582D6D1E-A8FC-4DD3-9C64-CAF8C0AF4F1C}.Debug|x64.Build.0 = Debug|x64
+		{582D6D1E-A8FC-4DD3-9C64-CAF8C0AF4F1C}.Release|x64.ActiveCfg = Release|x64
+		{582D6D1E-A8FC-4DD3-9C64-CAF8C0AF4F1C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D66F0BB8-3C57-4201-86F3-7A6F0697A50C}
+		SolutionGuid = {22C3E958-0656-49C9-8A1E-CBB22EAAE6A4}
 	EndGlobalSection
 EndGlobal

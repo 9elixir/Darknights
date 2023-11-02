@@ -8,8 +8,8 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	animation = nullptr;
 	bloodImg2 = nullptr;
 
-	window = new QWidget(nullptr);
-	window->setFixedSize(QSize(960, 768));
+	window = new QWidget(nullptr);//吃了大亏
+	window->setFixedSize(QSize(960, 738));
 	window->setWindowFlags(Qt::WindowMinimizeButtonHint);//只允许最小化
 
 	scrollArea = nullptr;
@@ -31,7 +31,7 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	Skill* s1 = new Skill{ 0 , 30 ,QString("几手") };
 	Skill* s2 = new Skill{ 20, 80, QString("冲盈") };
 	Skill* s3 = new Skill{ 40, 150, QString("我无") };
-	Skill* s4 = new Skill{ 80, 300, QString("拂尘") };
+	Skill* s4 = new Skill{ 80, 300, QString("拂尘") };//dedbug用
 	this->defence->setskill(s1, 1);
 	this->defence->setskill(s2, 2);
 	this->defence->setskill(s3, 3);
@@ -106,13 +106,13 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	characterLabel1 = new QLabel{ window };
 	characterLabel2 = new QLabel{ window };
 
-	characterLabel1->setFixedSize(QSize(300 * PercentWidth, 400 * PercentHeight));
-	characterLabel1->move(150 * PercentWidth, 200 * PercentHeight);
-	characterLabel2->setFixedSize(QSize(300 * PercentWidth, 400 * PercentHeight));
+	characterLabel1->setFixedSize(QSize(400 * PercentWidth, 400 * PercentHeight));
+	characterLabel1->move(50 * PercentWidth, 200 * PercentHeight);
+	characterLabel2->setFixedSize(QSize(400 * PercentWidth, 400 * PercentHeight));
 	characterLabel2->move(990 * PercentWidth, 200 * PercentHeight);
 	//设置图片
 	charactermov1 = new QMovie("imgs\\Chongyue\\CY-Idle.gif");
-	charactermov2 = new QMovie("imgs\\Tom.gif");
+	charactermov2 = new QMovie("imgs\\BigBob\\Bob-Idle.gif");
 
 	charactermov1->start();
 	charactermov2->start();
@@ -206,11 +206,15 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 
 	window->show();
 }
+void QtBattle::setFather(QtHello*father) {
+	this->father_window = father;
+}
 void QtBattle::setdefence(Defences* defence) {
 	this->defence = defence;
 }
 void QtBattle::BloodChange(QLabel*& ChangeLabel, int now, int max) {
-
+	//优化bug:蓝条不应该超过最大值也不该低于0，血条不应该高于最大值
+	now = std::max(0, min(now, max));
 	double PercentHeight = window->height() / 810.0;
 	double PercentWidth = window->width() / 1440.0;
 	QSize size1 = ChangeLabel->size();
@@ -234,7 +238,7 @@ void QtBattle::BloodChange(QLabel*& ChangeLabel, int now, int max) {
 
 	connect(animation, &QPropertyAnimation::valueChanged, [&ChangeLabel, new_width](const QVariant& value) {
 		//double Percent = value.toInt() / 100.0;
-		qDebug() << value.toSize();
+		//qDebug() << value.toSize();
 		//int now_width = Percent * (new_width - geo1.width()) + geo1.width();
 		//QPixmap pixmap = ChangeLabel->pixmap().scaledToWidth(now_width);//这里不能单独改变width,会导致height变化
 		int now_width = value.toSize().width();
@@ -266,9 +270,10 @@ void QtBattle::button1_clicked()
 		this->label->setSkillEffect("效果轻微");
 	}
 	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
-	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
+	this->magic1_now = std::max(0,min(this->magic1_now, this->magic1_max));
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
-	QMovie *attack = new QMovie("imgs\\Chongyue\\CY-Attack_A.gif");
+	QMovie* attack = new QMovie("imgs\\Chongyue\\CY-Attack_A.gif");
 	this->characterLabel1->setMovie(attack);
 
 	this->button_clicked_new();
@@ -283,17 +288,20 @@ void QtBattle::button1_clicked()
 			this->charactermov1->start();
 
 			this->blood2_now = this->blood2_now - this->button1->getSkillHurt();
-			this->BloodChange(this->bloodImg2, this->blood2_now,this->blood2_max);
+			this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+			this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
 
-			this->turnEnd();
+			
 
 			attack->stop();
+			qDebug() << QString("hello");
+			this->turnEnd();
 
 		}
 		});
 
 	attack->start();
-	
+
 }
 void QtBattle::button2_clicked()
 {
@@ -310,8 +318,9 @@ void QtBattle::button2_clicked()
 	else {
 		this->label->setSkillEffect("效果轻微");
 	}
-	this->magic1_now = this->magic1_now - this->button2->getSkillCost();
-	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
+	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
 	QMovie* skill1 = new QMovie("imgs\\Chongyue\\CY-Skill_1.gif");
 	this->characterLabel1->setMovie(skill1);
@@ -328,11 +337,13 @@ void QtBattle::button2_clicked()
 			this->charactermov1->start();
 
 			this->blood2_now = this->blood2_now - this->button2->getSkillHurt();
-			this->BloodChange(this->bloodImg2, this->blood2_now,this->blood2_max);
+			this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+			this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
 
-			this->turnEnd();
+			
 
 			skill1->stop();
+			this->turnEnd();
 
 		}
 		});
@@ -353,8 +364,9 @@ void QtBattle::button3_clicked() {
 	else {
 		this->label->setSkillEffect("效果轻微");
 	}
-	this->magic1_now = this->magic1_now - this->button3->getSkillCost();
-	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
+	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
 	QMovie* skill3 = new QMovie("imgs\\Chongyue\\CY-Skill_3.gif");
 	this->characterLabel1->setMovie(skill3);
@@ -371,22 +383,24 @@ void QtBattle::button3_clicked() {
 			this->charactermov1->start();
 
 			this->blood2_now = this->blood2_now - this->button3->getSkillHurt();
-			this->BloodChange(this->bloodImg2, this->blood2_now,this->blood2_max);
+			this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+			this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
 
-			this->turnEnd();
+			
 
 			skill3->stop();
+			this->turnEnd();
 
 		}
 		});
 
 	skill3->start();
-	
+
 }
 void QtBattle::button4_clicked() {
 	label->setbutton(this->button4);
 	//根据当前技能对敌人伤害的不同确定skilleffct
-	double hurtrate = double(this->button4->getSkillHurt()) /double( this->blood2_max);
+	double hurtrate = double(this->button4->getSkillHurt()) / double(this->blood2_max);
 	if (hurtrate >= 0.3) {
 		this->label->setSkillEffect("效果拔群！");
 	}
@@ -396,8 +410,9 @@ void QtBattle::button4_clicked() {
 	else {
 		this->label->setSkillEffect("效果轻微");
 	}
-	this->magic1_now = this->magic1_now - this->button4->getSkillCost();
-	this->BloodChange(this->magicImg1, this->magic1_now,this->magic1_max);
+	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
+	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
 	QMovie* skill2b = new QMovie("imgs\\Chongyue\\CY-Skill_2_Begin.gif");
 	QMovie* skill2e = new QMovie("imgs\\Chongyue\\CY-Skill_2_End.gif");
@@ -423,11 +438,11 @@ void QtBattle::button4_clicked() {
 					this->charactermov1->start();
 
 					this->blood2_now = this->blood2_now - this->button4->getSkillHurt();
-					this->BloodChange(this->bloodImg2, this->blood2_now,this->blood2_max);
-
-					this->turnEnd();
+					this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
+					this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
 
 					skill2e->stop();
+					this->turnEnd();
 				}
 				});
 
@@ -444,7 +459,7 @@ void QtBattle::button_clicked_new()
 	this->turnIn();
 	//绑定label和defence的名称
 	this->label->setcname(this->defence->getname());
-	this->label->setename("Tom");
+	this->label->setename("大鲍勃");
 }
 //在button_clicked_new中调用
 void QtBattle::turnIn() {
@@ -479,8 +494,11 @@ void QtBattle::turnBegin() {
 		button4->setEnabled(false);
 
 		this->label->enemyturn();
+		double enemey_hurt=100;
+		double enemey_cost=20;
+
 		//根据当前技能对敌人伤害的不同确定skilleffct
-		double hurtrate = double(40) / double(this->blood1_max);
+		double hurtrate = double(enemey_hurt) / double(this->blood1_max);
 
 		if (hurtrate >= 0.3) {
 			this->label->setSkillEffect("效果拔群！");
@@ -491,10 +509,40 @@ void QtBattle::turnBegin() {
 		else {
 			this->label->setSkillEffect("效果轻微");
 		}
-		this->blood1_now = this->blood1_now - 40;
-		this->BloodChange(this->bloodImg1, this->blood1_now,this->blood1_max);
-		this->magic2_now = this->magic2_now - 20;
-		this->BloodChange(this->magicImg2, this->magic2_now,this->magic2_max);
+	
+		this->magic2_now = this->magic2_now - enemey_cost;
+		this->magic2_now = std::max(0, min(this->magic2_now, this->magic2_max));//魔力不应该超过最大也不该小于0
+		this->BloodChange(this->magicImg2, this->magic2_now, this->magic2_max);
+
+		QMovie* eskill = new QMovie("imgs\\BigBob\\Bob-attack.gif");
+		this->characterLabel2->setMovie(eskill);
+
+		this->button_clicked_new();
+
+		//当动画播放完毕后，删除动画
+		connect(eskill, &QMovie::frameChanged, [this, eskill,enemey_hurt] {
+
+			//判断是否是最后一帧
+			if (eskill->currentFrameNumber() == eskill->frameCount() - 1) {
+
+				this->characterLabel2->setMovie(this->charactermov2);
+				this->charactermov2->start();
+
+				this->blood1_now = this->blood1_now - enemey_hurt;
+				this->blood1_now = min(this->blood1_now, this->blood1_max);//加血技能不应该超过最大，但是允许溢出打伤害
+				this->BloodChange(this->bloodImg1, this->blood1_now, this->blood1_max);
+
+				eskill->stop();
+				this->turnEnd();
+
+			}
+			});
+
+		eskill->start();
+		//if_my_turn = !if_my_turn;
+		this->blood1_now = this->blood1_now - enemey_hurt;
+		this->BloodChange(this->bloodImg1, this->blood1_now, this->blood1_max);
+		
 
 		turnEnd();
 	}
@@ -505,17 +553,24 @@ void QtBattle::turnEnd() {
 	//根据血量判断战斗是否结束
 	if_my_turn = !if_my_turn;
 
-	if (this->blood1_now > 0 && this->blood2_now > 0) { 
-			turnBegin(); 
+	if (this->blood1_now > 0 && this->blood2_now > 0) {
+		turnBegin();
 	}
 	else if (this->blood1_now <= 0 || this->blood2_now <= 0) {
 		if_fight_over = true;
 		if (this->blood1_now <= 0) {
+			int last_count = label->getsize();
 			label->setText("战斗结束！你输了！");
+			label->wrap(true,last_count);
+			//turnBegin();
 		}
 		else if (this->blood2_now <= 0) {
+			int last_count = label->getsize();
 			label->setText("战斗结束！你赢了！");
+			label->wrap(true, last_count);
+			//turnBegin();
 		}
+		checkwin();
 	}
 
 
@@ -542,8 +597,9 @@ ShowLabel::ShowLabel(const QString& text, QWidget* parent) : QLabel(text, parent
 	this->button = new SkillButton();
 }
 ShowLabel::~ShowLabel() {
-	delete this->button;
-	delete this->next;
+	//delete this->button;
+	//delete this->next;
+	//继承qt组件会随父亲一起被注销，手写继承也有这效果
 }
 void ShowLabel::setFont_height(int FONT_HEIGHT) {
 	this->font_height = FONT_HEIGHT;
@@ -584,7 +640,7 @@ void ShowLabel::wrap(bool b, int last_count) {
 		str = str + cha;
 		sumwidth = QFontMetrics(QFont("宋体", 12, 100)).boundingRect(str).width();
 		if (i > 1) {
-			qDebug() << str << " " << sumwidth << " this width=" << this->width;
+			//qDebug() << str << " " << sumwidth << " this width=" << this->width;
 			if (sumwidth > (this->width)) {
 				if (i + 1 < this->discription.size() && this->discription.at(i + 1) == '\n')
 				{
@@ -620,8 +676,8 @@ void ShowLabel::button_clicked() {
 void ShowLabel::enemyturn() {
 	int last_count = this->discription.size();
 	this->show = this->ename + QString("%1%2%3%4%5%6%7%8");
-	this->sname = "撕扯";
-	this->hurt = QString::number(40);
+	this->sname = "链锯击";
+	this->hurt = QString::number(100);
 	this->setText(show.arg("对").arg(cname).arg("使用了").arg(this->sname).arg("造成了").arg(hurt).arg("点伤害").arg(this->skilleffect));
 	this->wrap(true, last_count);
 }
@@ -636,6 +692,9 @@ void ShowLabel::readinskill(SkillButton* skill) {
 }
 void ShowLabel::setSkillEffect(const QString& effect) {
 	this->skilleffect = effect;
+}
+int ShowLabel::getsize() {
+	return this->discription.size();
 }
 QString ShowLabel::getSkillEffect() {
 	return this->skilleffect;
@@ -717,11 +776,27 @@ int SkillButton::getSkillHurt() {
 int SkillButton::getSkillLevel() {
 	return this->skilllevel;
 }
-
+void QtBattle::windowquit() {
+	window->setAttribute(Qt::WA_DeleteOnClose);
+	window->close();
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->close();
+}
 //设置label的边框
 void setlabelframe(QLabel* q, bool t) {
 	q->setFrameShape(QFrame::Box);
 	q->setFrameShadow(QFrame::Sunken);
 	q->setStyleSheet("border-width: 1px;border-style: solid;backgroundcolor:rgb(255,255,255);border-color: rgb(0, 0, 0);");
 
+}
+void QtBattle::checkwin() {
+	if (this->blood1_now <= 0)//主角
+	{
+		this->father_window->myMessage("游戏失败", "请再接再厉");//死了
+		this->father_window->check_alive(0);
+	}
+	if (this->blood2_now<=0) {//对面
+		this->father_window->myMessage("游戏胜利", "您赢得了本场战斗!经验值获得 exp");
+		this->father_window->check_alive(1);
+	}
 }

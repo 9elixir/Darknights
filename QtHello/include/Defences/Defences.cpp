@@ -3,7 +3,14 @@
 void Skill::setname(QString name) {
 	this->name = name;
 }
-
+void Skill::gecontent(Skill* s) {
+	this->name = s->name;
+	this->cost = s->cost;
+	this->hurt = s->hurt;
+}
+void Defences::setMap(Mapmsg*MAP) {
+	this->map = MAP;
+}
 Defences::Defences() {
 	this->person_id = 0;
 	this->picType = 0;
@@ -52,6 +59,19 @@ bool Defences::default_check(int x, int y) {
 		return true;
 	return false;
 }
+bool Defences::map_check(int x, int y) {
+	if (!(this->map)) {
+		cout << "defence not load the map!\n";
+		return false;
+	}
+	int widthpix = this->map->widthpix, heightpix = this->map->heightpix;
+	int width = this->map->cols * widthpix, height = this->map->rows * heightpix;
+
+	if (x<0||x+widthpix>width||y<0||y+heightpix>height)
+		return false;
+	if (this->map->MapMartix[y / heightpix][x / widthpix].touch_type!=0)return false;
+	return true;
+}
 void Defences::ChangePic(int PERSON_ID, int PICTYPE, int SHOWIDNOW) {
 	this->person_id = PERSON_ID;
 	this->picType = PICTYPE;
@@ -61,8 +81,8 @@ void Defences::Defence_Move(int deltax, int deltay) {
 	//int init_map_x=this->map_x, init_map_y=this->map_y;
 	//需要特殊判断地图边界，仍在制作中
 
-	//if (Map.check(this->map_x+deltax,this->map_y+deltay)==true) 
-	if (default_check(this->map_x + deltax, this->map_y + deltay))
+	if (map_check(this->map_x+deltax,this->map_y+deltay)==true) 
+	//if (default_check(this->map_x + deltax, this->map_y + deltay))
 	{
 		this->map_x += deltax;
 		this->map_y += deltay;
@@ -78,16 +98,16 @@ void Defences::get_x_and_y(int& X, int& Y) {
 void Defences::setskill(Skill* s, int index) {
 	switch (index) {
 	case 1:
-		this->skill1 = s;
+		this->skill1->gecontent(s);
 		break;
 	case 2:
-		this->skill2 = s;
+		this->skill2->gecontent(s);
 		break;
 	case 3:
-		this->skill3 = s;
+		this->skill3->gecontent(s);
 		break;
 	case 4:
-		this->skill4 = s;
+		this->skill4->gecontent(s);
 		break;
 	default:
 		std::cout << "error" << std::endl;

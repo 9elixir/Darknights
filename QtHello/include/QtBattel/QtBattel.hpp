@@ -13,11 +13,11 @@
 #include<qscrollbar.h>
 #include<qvariantanimation.h>
 #include "../Defences/Defences.hpp"
-
+#include"../../QtHello.hpp"
 class SkillButton;
 class ShowLabel;
 class AttributeLabel;
-
+class QtHello;//前向声明，在类的跨文件相互调用中很有用
 
 //QtBattel是用来显示战斗界面的
 class QtBattle :public QWidget {
@@ -29,12 +29,14 @@ public slots:
 	void button4_clicked();
 	void button_clicked_new();
 public:
+	void windowquit();
 	QtBattle(QWidget* parent = nullptr, std::string BattelBackPath = "BaseImages\\battleback.jpg", std::string littleimgPath = "BaseImages\\little_head.jpg");
 	//设置人物
 	void setdefence(Defences* defence);
-	void BloodChange(QLabel*& ChangeLabel, int now,int max);
+	void setFather(QtHello*father);//设置父窗口
+	void BloodChange(QLabel*& ChangeLabel, int now, int max);
 private:
-
+	QtHello* father_window;
 	QPropertyAnimation* animation;//行动动画
 
 	bool if_my_turn = true;//判断是否是我方回合
@@ -83,6 +85,7 @@ private:
 	void turnBegin();
 	void turnEnd();
 	bool if_fight_over = false;
+	void checkwin();
 };
 //MyLabel是用来显示战斗信息的
 class ShowLabel :public QLabel
@@ -101,6 +104,7 @@ public:
 	void setText(const QString& discription);
 	void setNext(ShowLabel* next);
 	void wrap(bool b = true, int last_count = 0); //换行
+	int getsize();//获得discription的大小
 	void readinskill(SkillButton* skill);
 	void setFont_height(int FONT_HEIGHT);
 	void setMyWidth(int WIDTH);
@@ -129,6 +133,7 @@ private:
 
 	ShowLabel* next;
 	SkillButton* button = nullptr;
+	
 };
 //SkillButton是用来显示技能信息的
 class SkillButton :public QCommandLinkButton

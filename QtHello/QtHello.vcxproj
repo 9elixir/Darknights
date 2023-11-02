@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5983C3B4-F6FC-4A23-A24D-91328DF66C63}</ProjectGuid>
+    <ProjectGuid>{582D6D1E-A8FC-4DD3-9C64-CAF8C0AF4F1C}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.22000.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
@@ -55,11 +55,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <ExecutablePath>D:\QT\6.5.2\msvc2019_64\include;$(ExecutablePath)</ExecutablePath>
-    <LibraryPath>D:\QT\6.5.2\msvc2019_64\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>"D:\QT\6.5.2\msvc2019_64\include";$(ExecutablePath)</ExecutablePath>
+    <LibraryPath>"D:\QT\6.5.2\msvc2019_64\lib";$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -80,14 +86,13 @@
       <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="QtHello.qrc" />
     <QtUic Include="QtHello.ui" />
-    <QtMoc Include="QtHello.hpp" />
     <ClCompile Include="include\Defences\Defences.cpp" />
     <ClCompile Include="include\init\init.cpp" />
     <ClCompile Include="include\QtBattel\QtBattel.cpp" />
@@ -98,6 +103,7 @@
     <ClInclude Include="include\Defences\Defences.hpp" />
     <ClInclude Include="include\init\init.hpp" />
     <QtMoc Include="include\QtBattel\QtBattel.hpp" />
+    <QtMoc Include="QtHello.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
