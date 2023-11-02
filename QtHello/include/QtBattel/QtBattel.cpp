@@ -109,7 +109,7 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	characterLabel1->setFixedSize(QSize(400 * PercentWidth, 400 * PercentHeight));
 	characterLabel1->move(50 * PercentWidth, 200 * PercentHeight);
 	characterLabel2->setFixedSize(QSize(400 * PercentWidth, 400 * PercentHeight));
-	characterLabel2->move(990 * PercentWidth, 200 * PercentHeight);
+	characterLabel2->move(950 * PercentWidth, 200 * PercentHeight);
 	//设置图片
 	charactermov1 = new QMovie("imgs\\Chongyue\\CY-Idle.gif");
 	charactermov2 = new QMovie("imgs\\BigBob\\Bob-Idle.gif");
@@ -291,8 +291,6 @@ void QtBattle::button1_clicked()
 			this->blood2_now = min(this->blood2_now, this->blood2_max);//加血技能不应该超过最大，但是允许溢出打伤害
 			this->BloodChange(this->bloodImg2, this->blood2_now, this->blood2_max);
 
-			
-
 			attack->stop();
 			qDebug() << QString("hello");
 			this->turnEnd();
@@ -318,7 +316,7 @@ void QtBattle::button2_clicked()
 	else {
 		this->label->setSkillEffect("效果轻微");
 	}
-	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = this->magic1_now - this->button2->getSkillCost();
 	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));
 	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
@@ -364,7 +362,7 @@ void QtBattle::button3_clicked() {
 	else {
 		this->label->setSkillEffect("效果轻微");
 	}
-	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = this->magic1_now - this->button3->getSkillCost();
 	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
 	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
@@ -410,7 +408,7 @@ void QtBattle::button4_clicked() {
 	else {
 		this->label->setSkillEffect("效果轻微");
 	}
-	this->magic1_now = this->magic1_now - this->button1->getSkillCost();
+	this->magic1_now = this->magic1_now - this->button4->getSkillCost();
 	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
 	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
@@ -539,12 +537,7 @@ void QtBattle::turnBegin() {
 			});
 
 		eskill->start();
-		//if_my_turn = !if_my_turn;
-		this->blood1_now = this->blood1_now - enemey_hurt;
-		this->BloodChange(this->bloodImg1, this->blood1_now, this->blood1_max);
-		
-
-		turnEnd();
+		//turnEnd();
 	}
 }
 //在BloodChange中调用
