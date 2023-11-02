@@ -40,7 +40,7 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	p1.drawPixmap(0, 0, backpix2);
 	p1.setCompositionMode(QPainter::CompositionMode_DestinationIn);
 	//根据QColor中第四个参数设置透明度，此处position的取值范围是0～255
-	p1.fillRect(temp.rect(), QColor(0, 0, 0, 100));
+	p1.fillRect(temp.rect(), QColor(0, 0, 0, 150));
 	p1.end();
 	backpix2 = temp;
 	backLabel->setPixmap(backpix2);
@@ -65,29 +65,31 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	this->defence->setskill(s3, 3);
 	this->defence->setskill(s4, 4);
 	this->defence->setname("重岳");
+
 	//上方的血条布局
-	bloodLabel1 = new QLabel("HP: ", window);
+	bloodLabel1 = new QLabel("HP", window);
 	bloodLabel1->setFixedSize(QSize(540 * PercentWidth, 90 * PercentHeight));
 	bloodLabel1->move(0, 0);
-	bloodLabel2 = new QLabel("HP: ", window);
+	bloodLabel2 = new QLabel("HP", window);
 	bloodLabel2->setFixedSize(QSize(540 * PercentWidth, 90 * PercentHeight));
 	bloodLabel2->move(900 * PercentWidth, 0 * PercentHeight);
-	std::string bloodpix_path1 = "BaseImages\\blood1.png";
-	std::string bloodpix_path2 = "BaseImages\\blood2.png";
+	std::string bloodpix_path1 = "BaseImages\\blood.png";
+	std::string bloodpix_path2 = "BaseImages\\blood.png";
+	
+	QPixmap bloodpix1(bloodpix_path1.data());
 	bloodImg1 = new QLabel(window);
 	bloodImg2 = new QLabel(window);
-	QPixmap bloodpix1(bloodpix_path1.data());
 	QPixmap bloodpix2(bloodpix_path2.data());
 	if (bloodpix1.isNull())bloodLabel1->setText("HPLOAD WRONG");
 	if (bloodpix2.isNull())bloodLabel2->setText("HPLOAD WRONG");
-	QSize qsizeblood1(440 * PercentWidth * (this->blood1_now * 1.0 / this->blood1_max), 90 * PercentHeight);//label总共540，前100不用
-	QSize qsizeblood2(440 * PercentWidth * (this->blood2_now * 1.0 / this->blood2_max), 90 * PercentHeight);//label总共540，前100不用
+	QSize qsizeblood1(440 * PercentWidth * (this->blood1_now * 1.0 / this->blood1_max), 50 * PercentHeight);//label总共540，前100不用
+	QSize qsizeblood2(440 * PercentWidth * (this->blood2_now * 1.0 / this->blood2_max), 50 * PercentHeight);//label总共540，前100不用
 	bloodImg1->setPixmap(bloodpix1.scaled(qsizeblood1));
 	bloodImg1->setFixedSize(qsizeblood1);
-	bloodImg1->move(100 * PercentWidth, 0 * PercentHeight);
+	bloodImg1->move(100 * PercentWidth, 20 * PercentHeight);
 	bloodImg2->setPixmap(bloodpix2.scaled(qsizeblood2));
 	bloodImg2->setFixedSize(qsizeblood2);
-	bloodImg2->move(1000 * PercentWidth, 0 * PercentHeight);
+	bloodImg2->move(1000 * PercentWidth, 20 * PercentHeight);
 
 	//上方蓝条布局
 	magicLabel1 = new QLabel("MP: ", window);
@@ -104,14 +106,14 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	QPixmap magicpix2(magicpix_path2);
 	if (magicpix1.isNull())magicLabel1->setText("MPLOAD WRONG");
 	if (magicpix2.isNull())magicLabel2->setText("MPLOAD WRONG");
-	QSize qsizemagic1(440 * PercentWidth * (this->magic1_now * 1.0 / this->magic1_max), 90 * PercentHeight);//label总共540，前100不用
-	QSize qsizemagic2(440 * PercentWidth * (this->magic2_now * 1.0 / this->magic2_max), 90 * PercentHeight);//label总共540，前100不用
+	QSize qsizemagic1(440 * PercentWidth * (this->magic1_now * 1.0 / this->magic1_max), 50 * PercentHeight);//label总共540，前100不用
+	QSize qsizemagic2(440 * PercentWidth * (this->magic2_now * 1.0 / this->magic2_max), 50 * PercentHeight);//label总共540，前100不用
 	magicImg1->setPixmap(magicpix1.scaled(qsizemagic1));
 	magicImg1->setFixedSize(qsizemagic1);
-	magicImg1->move(100 * PercentWidth, 90 * PercentHeight);
+	magicImg1->move(100 * PercentWidth, 110 * PercentHeight);
 	magicImg2->setPixmap(magicpix2.scaled(qsizemagic2));
 	magicImg2->setFixedSize(qsizemagic2);
-	magicImg2->move(1000 * PercentWidth, 90 * PercentHeight);
+	magicImg2->move(1000 * PercentWidth, 110 * PercentHeight);
 
 	//设置字体形式大小和对齐方式
 	bloodLabel1->setFont(QFont("宋体", 14, 100, true));
@@ -126,10 +128,10 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 
 
 	//显示血条和蓝条的边框
-	setlabelframe(bloodLabel1);
-	setlabelframe(bloodLabel2);
-	setlabelframe(magicLabel1);
-	setlabelframe(magicLabel2);
+	//setlabelframe(bloodLabel1);
+	//setlabelframe(bloodLabel2);
+	//setlabelframe(magicLabel1);
+	//setlabelframe(magicLabel2);
 	// 中间人物的图片布局
 	characterLabel1 = new QLabel{ window };
 	characterLabel2 = new QLabel{ window };
