@@ -12,6 +12,8 @@
 #include <Qmovie>
 #include<qscrollbar.h>
 #include<qvariantanimation.h>
+#include <QMediaPlayer>
+//#include <QMediaPlaylist>
 #include "../Defences/Defences.hpp"
 #include"../../QtHello.hpp"
 class SkillButton;
@@ -38,7 +40,7 @@ public:
 private:
 	QtHello* father_window;
 	QPropertyAnimation* animation;//行动动画
-
+	QMediaPlayer* player;
 	bool if_my_turn = true;//判断是否是我方回合
 	int blood1_now = 1000, blood1_max = 1000;//之后接入角色类（Defence后直接对Defence进行修改）
 	int blood2_now = 1070, blood2_max = 1070;//之后接入敌人类（Enemy后直接对Enemy进行修改）
@@ -46,7 +48,8 @@ private:
 	int magic2_now = 300, magic2_max = 300;
 	QWidget* window;
 	Defences* defence;
-
+	//窗口背景
+	QLabel* backLabel;
 	//上方的血条布局&蓝条布局
 	QLabel* bloodLabel1;
 	QLabel* bloodImg1;

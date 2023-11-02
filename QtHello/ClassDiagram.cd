@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Defences" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AGAAGBAEAgAIAAABgQAUJAwEAIABAgAAABAAQAAARAA=</HashCode>
+      <FileName>include\Defences\Defences.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="init" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>DAAAEAgAAACAQAiAAASCEgEAAIBBQAIACAAQAAACAAA=</HashCode>
+      <FileName>include\init\init.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QtBattle" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>UIFAAgIAECAAABESDBAQiNgAQsA4EIIIgACSBBAAAAI=</HashCode>
+      <FileName>include\QtBattel\QtBattel.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ShowLabel" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAwAAQHAJQQChgSAQAAoAADgIAEAgAIAJgSAAAYAAAQ=</HashCode>
+      <FileName>include\QtBattel\QtBattel.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SkillButton" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAEAAAAAAgUAAAACAAEADBCVAAEAIAAQAlAAAgCA=</HashCode>
+      <FileName>include\QtBattel\QtBattel.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="QtHello" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAkBAAFAAAsQCCAQCJIAgAAIhBAJAgAAEAAAQAAAA=</HashCode>
+      <FileName>QtHello.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Skill" Collapsed="true">
+    <Position X="2.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEUAAAAAACAQAAAAAA=</HashCode>
+      <FileName>include\Defences\Defences.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="PicMsg" Collapsed="true">
+    <Position X="4" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>include\init\init.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="RolePic" Collapsed="true">
+    <Position X="0.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\init\init.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Mappic" Collapsed="true">
+    <Position X="2.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAQAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>include\init\init.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Mapmsg" Collapsed="true">
+    <Position X="0.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABCAABBAAAAAAACAAAAAAAAAACAACAA=</HashCode>
+      <FileName>include\init\init.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="transmap" Collapsed="true">
+    <Position X="4" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\init\init.hpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

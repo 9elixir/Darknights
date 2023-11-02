@@ -11,12 +11,40 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	window = new QWidget(nullptr);//吃了大亏
 	window->setFixedSize(QSize(960, 738));
 	window->setWindowFlags(Qt::WindowMinimizeButtonHint);//只允许最小化
+	
+	//添加音乐播放器
+	// 创建 QMediaPlayer 对象
+	player = new QMediaPlayer;
+	// 加载音乐文件
+	player->setSource(QUrl::fromLocalFile("Music\\battlemusic.mp3"));
+	//player->addMedia(QUrl::fromLocalFile("Music\\battlemusic.mp3"));
 
+	// 播放音乐
+	player->play();
+	qDebug() << player;
 	scrollArea = nullptr;
+
 
 	double PercentHeight = window->height() / 810.0;//0.84
 	double PercentWidth = window->width() / 1440.0;//0.67
-
+	
+	//背景图片设置
+	backLabel = new QLabel(window);
+	QPixmap backpix("BaseImages//background.png");
+	QPixmap backpix2 = backpix.scaled(window->size());
+	QPixmap temp(backpix2.size());
+	 temp.fill(Qt::transparent);
+	
+	QPainter p1(&temp);
+	p1.setCompositionMode(QPainter::CompositionMode_Source);
+	p1.drawPixmap(0, 0, backpix2);
+	p1.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+	//根据QColor中第四个参数设置透明度，此处position的取值范围是0～255
+	p1.fillRect(temp.rect(), QColor(0, 0, 0, 100));
+	p1.end();
+	backpix2 = temp;
+	backLabel->setPixmap(backpix2);
+	
 	//回合显示
 	turnLabel = new QLabel(window);
 	QString turn_string = QString::number(turn_num);
@@ -31,7 +59,7 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	Skill* s1 = new Skill{ 0 , 30 ,QString("几手") };
 	Skill* s2 = new Skill{ 20, 80, QString("冲盈") };
 	Skill* s3 = new Skill{ 40, 150, QString("我无") };
-	Skill* s4 = new Skill{ 80, 300, QString("拂尘") };//dedbug用
+	Skill* s4 = new Skill{ 80, 580, QString("拂尘") };//dedbug用
 	this->defence->setskill(s1, 1);
 	this->defence->setskill(s2, 2);
 	this->defence->setskill(s3, 3);
@@ -106,13 +134,13 @@ QtBattle::QtBattle(QWidget* parent, std::string BattelBackPath, std::string litt
 	characterLabel1 = new QLabel{ window };
 	characterLabel2 = new QLabel{ window };
 
-	characterLabel1->setFixedSize(QSize(400 * PercentWidth, 400 * PercentHeight));
+	characterLabel1->setFixedSize(QSize(500 * PercentWidth, 400 * PercentHeight));
 	characterLabel1->move(50 * PercentWidth, 200 * PercentHeight);
-	characterLabel2->setFixedSize(QSize(400 * PercentWidth, 400 * PercentHeight));
-	characterLabel2->move(950 * PercentWidth, 200 * PercentHeight);
+	characterLabel2->setFixedSize(QSize(500 * PercentWidth, 400 * PercentHeight));
+	characterLabel2->move(900 * PercentWidth, 200 * PercentHeight);
 	//设置图片
-	charactermov1 = new QMovie("imgs\\Chongyue\\CY-Idle.gif");
-	charactermov2 = new QMovie("imgs\\BigBob\\Bob-Idle.gif");
+	charactermov1 = new QMovie("imgs\\Chongyue\\Idle.gif");
+	charactermov2 = new QMovie("imgs\\BigBob\\bobstand.gif");
 
 	charactermov1->start();
 	charactermov2->start();
@@ -273,7 +301,8 @@ void QtBattle::button1_clicked()
 	this->magic1_now = std::max(0,min(this->magic1_now, this->magic1_max));
 	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
-	QMovie* attack = new QMovie("imgs\\Chongyue\\CY-Attack_A.gif");
+	QMovie* attack = new QMovie("imgs\\Chongyue\\attack.gif");
+	attack->setSpeed(300);
 	this->characterLabel1->setMovie(attack);
 
 	this->button_clicked_new();
@@ -320,7 +349,8 @@ void QtBattle::button2_clicked()
 	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));
 	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
-	QMovie* skill1 = new QMovie("imgs\\Chongyue\\CY-Skill_1.gif");
+	QMovie* skill1 = new QMovie("imgs\\Chongyue\\Skill1.gif");
+	skill1->setSpeed(300);
 	this->characterLabel1->setMovie(skill1);
 
 	this->button_clicked_new();
@@ -366,9 +396,9 @@ void QtBattle::button3_clicked() {
 	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
 	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
-	QMovie* skill3 = new QMovie("imgs\\Chongyue\\CY-Skill_3.gif");
+	QMovie* skill3 = new QMovie("imgs\\Chongyue\\Skill3.gif");
 	this->characterLabel1->setMovie(skill3);
-
+	skill3->setSpeed(300);
 	this->button_clicked_new();
 
 	//当动画播放完毕后，删除动画
@@ -412,11 +442,11 @@ void QtBattle::button4_clicked() {
 	this->magic1_now = std::max(0, min(this->magic1_now, this->magic1_max));//魔力不应该超过最大也不该小于0
 	this->BloodChange(this->magicImg1, this->magic1_now, this->magic1_max);
 
-	QMovie* skill2b = new QMovie("imgs\\Chongyue\\CY-Skill_2_Begin.gif");
-	QMovie* skill2e = new QMovie("imgs\\Chongyue\\CY-Skill_2_End.gif");
+	QMovie* skill2b = new QMovie("imgs\\Chongyue\\Skill-2-Begin.gif");
+	QMovie* skill2e = new QMovie("imgs\\Chongyue\\Skill-2-End.gif");
 
 	this->characterLabel1->setMovie(skill2b);
-
+	skill2b->setSpeed(300);
 	this->button_clicked_new();
 
 	//当动画播放完毕后，删除动画
@@ -426,7 +456,7 @@ void QtBattle::button4_clicked() {
 		if (skill2b->currentFrameNumber() == skill2b->frameCount() - 1) {
 
 			this->characterLabel1->setMovie(skill2e);
-
+			skill2e->setSpeed(300);
 			connect(skill2e, &QMovie::frameChanged, [this, skill2e] {
 
 				//判断是否是最后一帧
@@ -512,7 +542,8 @@ void QtBattle::turnBegin() {
 		this->magic2_now = std::max(0, min(this->magic2_now, this->magic2_max));//魔力不应该超过最大也不该小于0
 		this->BloodChange(this->magicImg2, this->magic2_now, this->magic2_max);
 
-		QMovie* eskill = new QMovie("imgs\\BigBob\\Bob-attack.gif");
+		QMovie* eskill = new QMovie("imgs\\BigBob\\bobattack.gif");
+		eskill->setSpeed(300);
 		this->characterLabel2->setMovie(eskill);
 
 		this->button_clicked_new();
