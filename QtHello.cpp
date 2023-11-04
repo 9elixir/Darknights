@@ -341,7 +341,7 @@ void QtHello::createEneme(){
     this->eneme->person_id=1;
     this->eneme->picType=2;
     this->eneme->show_id_now=0;
-
+    this->eneme->setFather(this);
     if(!timer){
         timer=new QTimer(this);
         timer->setInterval(200);
@@ -543,7 +543,9 @@ void QtHello::updateenemey(){
             if(true){
                 if(
                     ((state==1||state==2)&&this->timecount==0)
-                    ||((state==3)&&((this->timecount==0)||this->timecount==2||this->timecount==4))
+                 //   ||((state==3)&&((this->timecount==0)||this->timecount==2||this->timecount==4))
+                    ||((state==3)&&((this->timecount==0)))
+
                     )
                     if(this->eneme->getworking()==false)
                 this->eneme->state_action(state,x,y);
@@ -594,12 +596,14 @@ int x3,y3;
             if(music_id!=2){
                 this->player->setSource(QUrl::fromLocalFile("music\\rushing.mp3"));
                 this->player->setLoops(-1);
+                this->player->play();
                 music_id=2;
             }
       }else{
             if(music_id!=1){
                 this->player->setSource(QUrl::fromLocalFile("music\\relaxing.mp3"));
                 this->player->setLoops(-1);
+                this->player->play();
                 music_id=1;
             }
       }
@@ -646,6 +650,7 @@ void QtHello::OpenBattle() {
 	this->my_battle->setFather(this);
 	this->hide();
     if(this->timer)this->timer->stop();
+    if(this->player)player->hide();
 	//check_alive(0);
 }
 

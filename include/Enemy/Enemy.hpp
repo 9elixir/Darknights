@@ -6,6 +6,7 @@
 #include<stack>
 
 #include <QElapsedTimer>
+class QtHello;
 class Enemy
 {
 private:
@@ -22,10 +23,11 @@ private:
     int size_x,size_y;
     int toward;//1 朝下 2左 3右 4上
     int WalkPace,RunPace;
-
+    QtHello* qthello;
     Dijk* dijk;
    // PATH posmap;
 public:
+    void setFather(QtHello* hello);
     bool eye_contact(int Cx,int Cy);
     int getstate();
     int getHp();

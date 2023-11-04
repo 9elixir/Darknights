@@ -1,5 +1,6 @@
 ﻿#include "Enemy.hpp"
-
+#include"../../QtHello.hpp"
+class QtHello;
 int Enemy::getHp(){
     return this->Health;
 }
@@ -133,6 +134,9 @@ void Enemy::setstate(int index){
         std::cout<<"Enemy setstate over range!\n";
     }
 }
+void Enemy::setFather(QtHello* hello){
+    this->qthello=hello;
+}
 void Enemy::setdetail(){
     //this->level=Lv;
     this->Health_max=this->level*60+2000;//体力最大值为60倍Lv+2000
@@ -226,6 +230,7 @@ void Enemy::state_action(int index,int Cx,int Cy){//传入像素
 
                 int nnx = tid%this->dijk->copymap.cols,nny=tid/this->dijk->copymap.cols;
                 this->Defence_Move((nnx-nx)*this->dijk->copymap.widthpix,(nny-ny)*this->dijk->copymap.heightpix);//地图块到像素化
+                emit this->qthello->updateenemey();
                 if(eye_contact(Cx,Cy)){
                 qDebug()<<"Eneme have Found You!";
                     this->state=3;
@@ -273,6 +278,7 @@ void Enemy::state_action(int index,int Cx,int Cy){//传入像素
 
                     int nnx = tid%this->dijk->copymap.cols,nny=tid/this->dijk->copymap.cols;
                     this->Defence_Move((nnx-nx)*this->dijk->copymap.widthpix,(nny-ny)*this->dijk->copymap.heightpix);//地图块到像素化
+                    emit this->qthello->updateenemey();
                     if(eye_contact(Cx,Cy)){
                         std::cout<<"Eneme have Found You!\n";
                         this->state=3;
@@ -323,6 +329,7 @@ void Enemy::state_action(int index,int Cx,int Cy){//传入像素
 
                         int nnx = tid%this->dijk->copymap.cols,nny=tid/this->dijk->copymap.cols;
                         this->Defence_Move((nnx-nx)*this->dijk->copymap.widthpix,(nny-ny)*this->dijk->copymap.heightpix);//地图块到像素化
+                        emit this->qthello->updateenemey();
                         /*if(!eye_contact(Cx,Cy)){//一个扭头就失效了
                             std::cout<<"Eneme Cannot See You!\n";
                             this->state=1;

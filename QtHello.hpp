@@ -4,9 +4,11 @@
 #include"include/QtBattel/QtBattel.hpp"
 #include"include/QtWelcome/QtWelcome.hpp"
 #include"include/Menu/Menu.hpp"
+#include"include/Enemy/Enemy.hpp"
 #include <QRandomGenerator>
 class QtWelcome;
 class Menu;
+class Enemy;
 class QtHello : public QWidget
 {
 	Q_OBJECT
