@@ -63,7 +63,7 @@ void Dijk::setmap(Mapmsg* map){
             copymap.Martix[i][j]=map->MapMartix[i][j].touch_type;
     }
 }
-PATH Dijk::calculatemap(int x,int y){
+PATH Dijk::calculatemap(int x,int y){//传入的是块号
    // qDebug()<<"Dijk::calculatemap:x="<<x<<",y="<<y;
     int id=y*copymap.cols+x;
    // qDebug()<<"and in the dijk,id="<<id;
