@@ -113,6 +113,11 @@ Defences::Defences(int PERSON_ID, int PICTYPE, int SHOWIDNOW, int X, int Y, int 
 	this->Health_max = this->Health = Health_INIT;
 	this->Attack = ATTACK_INIT;
 	this->Defent = Defence_INIT;
+
+    this->skill1=nullptr;
+    this->skill2=nullptr;
+    this->skill3=nullptr;
+    this->skill4=nullptr;
 /*
  我们将技能设置分出去了
 	Skill* nulls = new Skill{
@@ -124,10 +129,18 @@ Defences::Defences(int PERSON_ID, int PICTYPE, int SHOWIDNOW, int X, int Y, int 
     this->setskill(nulls, 4);*/
 }
 Defences::~Defences() {
-	delete this->skill1;
-	delete this->skill2;
-	delete this->skill3;
-	delete this->skill4;
+    if(this->skill1)
+    {delete this->skill1;
+    }
+    if(this->skill2)
+    { delete this->skill2;
+    }
+
+    if(this->skill3)
+    delete this->skill3;
+
+
+    if(this->skill4)delete this->skill4;
 }
 bool Defences::default_check(int x, int y) {
 	if (1 <= x && x <= 520 && 1 <= y && y <= 360)

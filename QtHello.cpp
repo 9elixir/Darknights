@@ -650,7 +650,7 @@ void QtHello::OpenBattle() {
 	this->my_battle->setFather(this);
 	this->hide();
     if(this->timer)this->timer->stop();
-    if(this->player)player->hide();
+    if(this->player)player->stop();
 	//check_alive(0);
 }
 
