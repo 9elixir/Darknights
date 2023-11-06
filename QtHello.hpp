@@ -40,11 +40,13 @@ public:
   void updateenemey();
   Defences *getman();
 signals:
+  void createenemefinshed();
   void updateenemeyfinshed();
   void updateview3end();
 private slots:
   bool updateView2();
   bool updateView3();
+  void buildconnection();
 
 private:
   void updateenemelambda();

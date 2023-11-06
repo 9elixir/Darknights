@@ -338,8 +338,17 @@ void Enemy::state_action(int index, int Cx, int Cy) { // 传入像素
                              this->dijk->copymap.heightpix); // 地图块到像素化
 
       emit this->qthello->updateenemeyfinshed();
+      this->qthello->connect(this->qthello, &QtHello::updateenemeyfinshed,
+                             &this->loop, &QEventLoop::quit);
       // emit this->qthello->updateenemey();
-      loop.exec();
+      // loop.exec();
+      try {
+        // 可能会引发异常的代码
+        loop.exec();
+      } catch (const std::exception &e) {
+        // 处理标准异常
+        qDebug() << "Caught exception:" << e.what();
+      }
       /*if(!eye_contact(Cx,Cy)){//一个扭头就失效了
           std::cout<<"Eneme Cannot See You!\n";
           this->state=1;

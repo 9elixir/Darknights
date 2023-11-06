@@ -299,7 +299,10 @@ int QtBattle::exp_caculate() {
   sum = sum * sum;
   return sum;
 }
-void QtBattle::setFather(QtHello *father) { this->father_window = father; }
+void QtBattle::setFather(QtHello *father) {
+  this->father_window = father;
+  this->father_window->getplayer()->stop();
+}
 void QtBattle::setdefence(Defences *defence) {
   this->defence = defence;
   this->blood1_max = this->defence->getHpMax();
@@ -329,6 +332,18 @@ void QtBattle::BloodChange(QLabel *&ChangeLabel, int now, int max,
   int new_width = 440 * PercentWidth * (now * 1.0 / max);
   size2.setWidth(new_width);
 
+  if (delta_value != 0)
+    qDebug() << " in the BloodChange,delta_value=" << delta_value
+             << ",now=" << now << ",max=" << max;
+  if (this->HurtLabel) {
+    delete HurtLabel;
+    HurtLabel = nullptr;
+  }
+  if (this->animation) {
+    delete (this->animation);
+    this->animation = nullptr;
+  }
+
   // 创建属性动画，将 QLabel 的 pixmap 属性从起始图片渐变到目标图片
   // 注意，pixmap不能作为动画的属性
   // 使用geometry只改变geometry，size不会变化，text和pixmap不会随之变化,必须重新手写
@@ -339,13 +354,11 @@ void QtBattle::BloodChange(QLabel *&ChangeLabel, int now, int max,
   animation->setDuration(600); // 动画持续时间为 600 毫秒
   animation->setStartValue(size1);
   animation->setEndValue(size2);
+  //  qDebug() << "hi" << size1 << "," << size2;
   animation->setEasingCurve(QEasingCurve::InOutQuad); // 使用平滑的缓动曲线
   // 启动动画
   ChangeLabel->show();
-  if (this->HurtLabel) {
-    delete HurtLabel;
-    HurtLabel = nullptr;
-  }
+
   HurtLabel = new QLabel(this->window);
   this->hurt_pos = 1;
   this->hurt_show_time_count = 0;
@@ -353,15 +366,15 @@ void QtBattle::BloodChange(QLabel *&ChangeLabel, int now, int max,
           [&ChangeLabel, this, delta_value, PercentHeight,
            PercentWidth](const QVariant &value) {
             // double Percent = value.toInt() / 100.0;
-            // qDebug() << value.toSize();
+            // qDebug() << value.toSize()
+            //<< ",timecount=" << this->hurt_show_time_count;
             // int now_width = Percent * (new_width - geo1.width()) +
             // geo1.width(); QPixmap pixmap =
             // ChangeLabel->pixmap().scaledToWidth(now_width);//这里不能单独改变width,会导致height变化
 
             int now_width = value.toSize().width();
             QPixmap pixmap = ChangeLabel->pixmap().scaled(value.toSize());
-            ChangeLabel->setFixedWidth(now_width);
-            ChangeLabel->setFixedHeight(value.toSize().height());
+            ChangeLabel->setFixedSize(pixmap.size());
             ChangeLabel->setPixmap(pixmap);
 
             if (delta_value != 0) {
@@ -376,7 +389,7 @@ void QtBattle::BloodChange(QLabel *&ChangeLabel, int now, int max,
                 int x0 = ChangeLabel->pos().x(), y0 = ChangeLabel->pos().y();
                 x0 += this->bloodLabel1->width() / 2;
                 y0 += this->bloodLabel1->height() / 2;
-                qDebug() << "x0=" << x0 << ",y0=" << y0;
+                //   qDebug() << "x0=" << x0 << ",y0=" << y0;
 
                 y0 += 200 * PercentHeight;
                 x0 += this->hurt_pos * 60 * PercentWidth;
@@ -399,7 +412,7 @@ void QtBattle::BloodChange(QLabel *&ChangeLabel, int now, int max,
             }
           });
 
-  connect(animation, &QPropertyAnimation::finished, [this]() {
+  connect(animation, &QPropertyAnimation::finished, [this, delta_value]() {
     if (this->animation) {
       delete (this->animation);
       this->animation = nullptr;
@@ -409,6 +422,8 @@ void QtBattle::BloodChange(QLabel *&ChangeLabel, int now, int max,
       delete (this->HurtLabel);
       this->HurtLabel = nullptr;
     }
+    if (delta_value != 0)
+      this->turnEnd();
   });
   animation->start();
 }
@@ -418,7 +433,7 @@ void QtBattle::button1_clicked() {
   double realhurt = this->defence->getAttack() + this->button1->getSkillHurt() -
                     this->enemy->getDefence(); // 担心没破防
   // 根据当前技能对敌人伤害的不同确定skilleffct
-  double hurtrate = double(max(0.0, realhurt)) / double(this->blood2_max);
+  double hurtrate = double(max(10.0, realhurt)) / double(this->blood2_max);
 
   if (hurtrate >= 0.3) {
     this->label->setSkillEffect(QString("效果拔群！"));
@@ -452,8 +467,10 @@ void QtBattle::button1_clicked() {
   connect(skillmov, &QMovie::frameChanged, [this, realhurt]() {
     // 判断是否是最后一帧
     if (skillmov->currentFrameNumber() == skillmov->frameCount() - 1) {
-      delete tempbuf;
-      tempbuf = nullptr;
+      if (tempbuf) {
+        delete tempbuf;
+        tempbuf = nullptr;
+      }
       this->characterLabel1->setMovie(this->charactermov1);
       this->charactermov1->start();
 
@@ -466,7 +483,6 @@ void QtBattle::button1_clicked() {
 
       skillmov->stop();
       // qDebug() << QString("hello");
-      this->turnEnd();
 
     } else {
       int x0 = this->characterLabel1->pos().x();
@@ -507,7 +523,7 @@ void QtBattle::button2_clicked() {
   double realhurt = this->defence->getAttack() + this->button2->getSkillHurt() -
                     this->enemy->getDefence(); // 担心没破防
   // 根据当前技能对敌人伤害的不同确定skilleffct
-  double hurtrate = double(max(0.0, realhurt)) / double(this->blood2_max);
+  double hurtrate = double(max(10.0, realhurt)) / double(this->blood2_max);
 
   if (hurtrate >= 0.3) {
     this->label->setSkillEffect(QString("效果拔群！"));
@@ -543,8 +559,10 @@ void QtBattle::button2_clicked() {
   connect(skillmov, &QMovie::frameChanged, [this, realhurt] {
     // 判断是否是最后一帧
     if (skillmov->currentFrameNumber() == skillmov->frameCount() - 1) {
-      delete tempbuf;
-      tempbuf = nullptr;
+      if (tempbuf) {
+        delete tempbuf;
+        tempbuf = nullptr;
+      }
       this->characterLabel1->setMovie(this->charactermov1);
       this->charactermov1->start();
 
@@ -557,7 +575,7 @@ void QtBattle::button2_clicked() {
 
       skillmov->stop();
       // qDebug() << QString("hello");
-      this->turnEnd();
+      // this->turnEnd();
 
     } else {
       int x0 = this->characterLabel1->pos().x();
@@ -594,7 +612,7 @@ void QtBattle::button3_clicked() {
   double realhurt = this->defence->getAttack() + this->button3->getSkillHurt() -
                     this->enemy->getDefence(); // 担心没破防
   // 根据当前技能对敌人伤害的不同确定skilleffct
-  double hurtrate = double(max(0.0, realhurt)) / double(this->blood2_max);
+  double hurtrate = double(max(10.0, realhurt)) / double(this->blood2_max);
 
   if (hurtrate >= 0.3) {
     this->label->setSkillEffect(QString("效果拔群！"));
@@ -632,8 +650,10 @@ void QtBattle::button3_clicked() {
   connect(skillmov, &QMovie::frameChanged, [this, realhurt] {
     // 判断是否是最后一帧
     if (skillmov->currentFrameNumber() == skillmov->frameCount() - 1) {
-      delete tempbuf;
-      tempbuf = nullptr;
+      if (tempbuf) {
+        delete tempbuf;
+        tempbuf = nullptr;
+      }
       this->characterLabel1->setMovie(this->charactermov1);
       this->charactermov1->start();
 
@@ -646,7 +666,7 @@ void QtBattle::button3_clicked() {
 
       skillmov->stop();
       // qDebug() << QString("hello");
-      this->turnEnd();
+      // this->turnEnd();
 
     } else {
       int x0 = this->characterLabel1->pos().x();
@@ -681,7 +701,7 @@ void QtBattle::button4_clicked() {
   double realhurt = this->defence->getAttack() + this->button4->getSkillHurt() -
                     this->enemy->getDefence(); // 担心没破防
   // 根据当前技能对敌人伤害的不同确定skilleffct
-  double hurtrate = double(max(0.0, realhurt)) / double(this->blood2_max);
+  double hurtrate = double(max(10.0, realhurt)) / double(this->blood2_max);
 
   if (hurtrate >= 0.3) {
     this->label->setSkillEffect(QString("效果拔群！"));
@@ -730,8 +750,10 @@ void QtBattle::button4_clicked() {
       connect(skillmov2, &QMovie::frameChanged, [this, realhurt] {
         // 判断是否是最后一帧
         if (skillmov2->currentFrameNumber() == skillmov2->frameCount() - 1) {
-          delete tempbuf;
-          tempbuf = nullptr;
+          if (tempbuf) {
+            delete tempbuf;
+            tempbuf = nullptr;
+          }
           this->characterLabel1->setMovie(this->charactermov1);
           this->charactermov1->start();
 
@@ -743,7 +765,7 @@ void QtBattle::button4_clicked() {
                             realhurt);
 
           skillmov2->stop();
-          this->turnEnd();
+          // this->turnEnd();
         } else {
           int x0 = this->characterLabel1->pos().x();
           int x1 = this->characterLabel2->pos().x();
@@ -799,7 +821,7 @@ void QtBattle::EnemyLogic() {
   double realhurt = this->enemy->getAttack() + enemey_hurt -
                     this->defence->getDefence(); // 担心没破防
   // 根据当前技能对敌人伤害的不同确定skilleffct
-  double hurtrate = double(max(0.0, realhurt)) / double(this->blood1_max);
+  double hurtrate = double(max(10.0, realhurt)) / double(this->blood1_max);
 
   if (hurtrate >= 0.3) {
     this->label->setSkillEffect("效果拔群！");
@@ -838,9 +860,10 @@ void QtBattle::EnemyLogic() {
   connect(skillmov, &QMovie::frameChanged, [this, realhurt] {
     // 判断是否是最后一帧
     if (skillmov->currentFrameNumber() == skillmov->frameCount() - 1) {
-
-      delete tempbuf;
-      tempbuf = nullptr;
+      if (tempbuf) {
+        delete tempbuf;
+        tempbuf = nullptr;
+      }
       this->characterLabel2->setMovie(this->charactermov2);
       this->charactermov2->start();
 
@@ -852,7 +875,7 @@ void QtBattle::EnemyLogic() {
                         realhurt);
 
       skillmov->stop();
-      this->turnEnd();
+      // this->turnEnd();
     } else {
 
       int x0 = this->characterLabel1->pos().x();
@@ -1041,9 +1064,8 @@ ShowLabel::ShowLabel(const QString &text, QWidget *parent)
     : QLabel(text, parent) {
   this->discription = text;
   this->QLabel::setFixedSize(this->width, this->height);
-  this->setFont(QFont(
-      "宋体", 12,
-      100)); // 12号字体汉字，刚好能在420的宽度下显示25个；14号字体数字，加粗刚好能在420的宽度下显示50个
+  this->setFont(QFont("宋体", 12,
+                      100)); //
   this->contents_rows = 1;
   this->wrap(true, 0);                              // 自动换行
   this->setAlignment(Qt::AlignTop | Qt::AlignLeft); // 设置文字对齐方式
@@ -1064,9 +1086,8 @@ void ShowLabel::setMyWidth(int WIDTH) { this->width = WIDTH; }
 void ShowLabel::setText(const QString &text) {
   // std::string strtemp=text.toStdString();
   this->discription = this->discription + QString("\n") + text;
-  this->setFont(QFont(
-      "宋体", 12,
-      100)); // 12号字体汉字，刚好能在420的宽度下显示25个；14号字体数字，加粗刚好能在420的宽度下显示50个
+  this->setFont(QFont("宋体", 12,
+                      100));                        //
   this->setAlignment(Qt::AlignTop | Qt::AlignLeft); // 设置文字对齐方式
   this->QLabel::setText(this->discription);
 }
@@ -1122,7 +1143,7 @@ void ShowLabel::button_clicked() {
   this->sname = this->button->getSkillName();
   int realhurt = this->button->getSkillHurt();
   realhurt += this->attack - this->defence;
-  realhurt = max(0, realhurt);
+  realhurt = max(10, realhurt);
   this->hurt = QString::number(realhurt);
 
   this->setText(show.arg("对")
@@ -1138,7 +1159,7 @@ void ShowLabel::button_clicked() {
 void ShowLabel::enemyturn() {
   int realhurt = 40;
   realhurt += this->attack - this->defence;
-  realhurt = max(0, realhurt);
+  realhurt = max(10, realhurt);
 
   int last_count = this->discription.size();
   this->show = this->ename + QString("%1%2%3%4%5%6%7%8");

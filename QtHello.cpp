@@ -141,7 +141,7 @@ QtHello::QtHello(QWidget *parent) : QWidget(parent) {
 
   this->timecount = 0;
   connect(this, &QtHello::updateenemeyfinshed, this, &QtHello::updateView3);
-
+  connect(this, &QtHello::createenemefinshed, this, &QtHello::buildconnection);
   audio = new QAudioOutput(this);
   player = new QMediaPlayer(this);
   player->setAudioOutput(audio);
@@ -150,7 +150,26 @@ QtHello::QtHello(QWidget *parent) : QWidget(parent) {
   player->play();
   this->music_id = 1;
 
+  timer = new QTimer(this);
+  timer->stop();
   ui.setupUi(this);
+}
+void QtHello::buildconnection() {
+
+  timer->setInterval(200);
+  timer->stop();
+  disconnect(this, &QtHello::updateenemeyfinshed, nullptr, nullptr);
+
+  disconnect(timer, &QTimer::timeout, this, nullptr);
+
+  connect(this, &QtHello::updateview3end, this, &QtHello::quitloop);
+  connect(this, &QtHello::updateenemeyfinshed, this,
+          &QtHello::updateenemelambda);
+  connect(timer, &QTimer::timeout, this, &QtHello::timeoutlambda);
+  // timer->stop();
+  timer->start();
+  qDebug() << "build connectiondone";
+  this->timecount = 3;
 }
 void QtHello::myMessage(std::string title, std::string message) {
   // qDebug()<<message;
@@ -205,7 +224,7 @@ bool QtHello::mySetBackPicture(std::string s) {
   QPixmap pixmap(s.data()); // Qpix使用完可以直接销毁，但是Label、Layout不行
   if (pixmap.isNull()) {
     myMessage("mySetBackPicture(std::string s)", "pixmap is NULL!");
-
+    delete label;
     // std::cout << "Wrong Pic Path!.\n";
     return false;
   }
@@ -221,6 +240,7 @@ bool QtHello::mySetBackPicture(std::string s) {
   layout->addWidget(label);*/
   // this->show();
   label->show();
+  delete label;
   return true;
 }
 bool QtHello::mySetBackPicture() {
@@ -349,8 +369,8 @@ void QtHello::createman() {
 void QtHello::updateenemelambda() {
   this->timer->stop();
   this->updateView3();
-  if (this->eneme->getstate() != 4)
-    this->timer->start();
+  // if (this->eneme->getstate() != 4)
+  //  this->timer->start();
 }
 void QtHello::timeoutlambda() {
   this->timer->stop();
@@ -360,7 +380,10 @@ void QtHello::timeoutlambda() {
 
   this->updateenemey();
 }
-void QtHello::quitloop() { this->eneme->loop.quit(); }
+void QtHello::quitloop() {
+  this->eneme->loop.quit();
+  // qDebug() << "ok,the loop quit";
+}
 void QtHello::createEneme() {
   qDebug() << "create the Eneme";
   if (eneme) {
@@ -372,7 +395,9 @@ void QtHello::createEneme() {
   qDebug() << "x0=" << X0 << ",y0=" << Y0;
   this->eneme = new Enemy(X0, Y0, &(this->map));
   this->eneme->setFather(this);
-  connect(this, &QtHello::updateview3end, this, &QtHello::quitloop);
+  if (!(this->eneme))
+    qDebug() << "when we new the eneme,may be it NULL?";
+
   /// this->getRandomXY(X,Y);
 
   this->eneme->set_x1_and_y1(X1, Y1);
@@ -388,18 +413,8 @@ void QtHello::createEneme() {
   this->eneme->picType = 2;
   this->eneme->show_id_now = 0;
 
-  if (!timer) {
-    timer = new QTimer(this);
-    timer->setInterval(200);
-  }
-  timer->stop();
-  disconnect(this, &QtHello::updateenemeyfinshed, nullptr, nullptr);
-  connect(this, &QtHello::updateenemeyfinshed, this,
-          &QtHello::updateenemelambda);
-  disconnect(timer, &QTimer::timeout, this, nullptr);
-  connect(timer, &QTimer::timeout, this, &QtHello::timeoutlambda);
-  timer->start();
-  // timer->stop();
+  emit this->createenemefinshed();
+
   this->updateView2();
 }
 void QtHello::keyPressEvent(QKeyEvent *event) { // 监听按键
@@ -703,6 +718,8 @@ bool QtHello::updateView3() {
       // timer->stop();
       if (!this->my_battle && this->eneme->getstate() != 4) {
         this->eneme->setstate(4);
+        this->player->stop(); // 没法debug了，强制了
+        this->timer->stop();
         this->OpenBattle();
       }
     }
@@ -736,6 +753,8 @@ bool QtHello::updateView3() {
   if (this->eneme->getstate() == 4) {
     this->player->stop();
   }
+  if (this->eneme->getstate() != 4)
+    this->timer->start();
   emit this->updateview3end();
   // loop.quit();//太耗时了。
   // this->timer->start();
@@ -790,9 +809,8 @@ bool QtHello::updateView2() {
   int x3, y3;
   if (this->eneme) {
     this->eneme->get_x_and_y(x3, y3);
-    if (this->timecount == 0)
-      qDebug() << "eneme pos:" << x3 << " " << y3
-               << ",state=" << this->eneme->getstate();
+
+    // qDebug() << "timecount=" << timecount;
     QPixmap pixmapeneme1((this->RolesPicList[this->eneme->person_id])
                              .PicList[this->eneme->picType]
                              .pic_paths[this->eneme->show_id_now]
@@ -843,6 +861,7 @@ bool QtHello::updateView2() {
       if (!this->my_battle && this->eneme->getstate() != 4) {
         this->eneme->setstate(4);
         this->player->stop();
+        this->timer->stop();
         this->OpenBattle();
       }
     }
